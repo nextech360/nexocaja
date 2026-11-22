@@ -1,0 +1,42 @@
+NEXOCAJA - PUNTO DE VENTA
+Creado por Erick Nex - NexTech360 (c) 2026
+=====================================================
+
+INSTALACION (una sola vez)
+
+1. Antes de descomprimir: clic derecho sobre el ZIP > Propiedades >
+   marca "Desbloquear" > Aceptar. Si no, Windows bloquea los .bat.
+
+2. Extrae todo, por ejemplo en:  Documentos\NexoCaja
+
+3. Doble clic en  instalar.bat
+   Acepta "Permitir cambios" si Windows lo pregunta.
+   Cuando termine, reinicia la PC.
+
+4. Doble clic en  iniciar.bat
+   Se abre una ventana negra y el navegador con NexoCaja
+   (http://localhost:3360).
+   Deja la ventana negra ABIERTA mientras uses el sistema.
+   Si sale el Firewall de Windows, marca "Redes privadas" y permite.
+
+USO DIARIO
+
+- Para abrir NexoCaja: doble clic en iniciar.bat
+- Si algo se traba: doble clic en reiniciar.bat
+
+ACTUALIZACIONES
+
+- Cuando haya una version nueva, aparece una barra amarilla arriba
+  con el boton "Actualizar". Solo dale clic y espera unos segundos.
+- No hay que descargar nada mas.
+- Antes de actualizar se guarda una copia de tus datos.
+
+TUS DATOS (IMPORTANTE)
+
+- Tus ventas, productos y clientes estan en la carpeta  datos
+  dentro de NexoCaja. Las copias de seguridad estan en  datos\respaldos
+- Tus ajustes (nombre de la empresa, RNC, puerto) estan en  config.json
+- NO borres la carpeta  datos  ni  config.json
+- Si mueves NexoCaja a otra PC, copia la carpeta completa.
+
+Soporte: Erick Nex - NexTech360

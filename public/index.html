@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NexoCaja · Punto de Venta</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="update-bar" class="nx-update" role="status" hidden>
+    <div class="nx-update-text">
+      <strong>Hay una versión nueva de NexoCaja: <span id="upd-version" class="nx-num"></span></strong>
+      <span id="upd-notes"></span>
+      <span id="upd-msg" class="nx-update-msg"></span>
+    </div>
+    <div class="nx-update-actions">
+      <button id="btn-update" class="nx-btn nx-btn--primary" type="button">Actualizar</button>
+      <button id="btn-later" class="nx-btn" type="button">Luego</button>
+    </div>
+  </div>
+
+  <header class="nx-header">
+    <div class="nx-brand">
+      <span class="nx-logo" aria-hidden="true">N</span>
+      <div>
+        <div class="nx-brand-name">nexo<span>caja</span></div>
+        <div class="nx-brand-sub">PUNTO DE VENTA · DGII</div>
+      </div>
+    </div>
+    <div class="nx-spacer"></div>
+    <div class="nx-company">
+      <strong id="company-name">…</strong>
+      <span id="company-sub"></span>
+    </div>
+  </header>
+
+  <main class="nx-main">
+    <h1>Estado de la instalación</h1>
+    <p id="error" class="nx-alert" role="alert" hidden></p>
+    <div class="nx-grid">
+      <section class="nx-card">
+        <h2>Sistema</h2>
+        <dl>
+          <dt>Versión</dt><dd class="nx-num" id="s-version">…</dd>
+          <dt>Base de datos</dt><dd id="s-db">…</dd>
+          <dt>Esquema</dt><dd class="nx-num" id="s-schema">…</dd>
+          <dt>Node.js</dt><dd class="nx-num" id="s-node">…</dd>
+          <dt>Actualizaciones</dt><dd id="s-update">…</dd>
+        </dl>
+        <button id="btn-check" class="nx-btn" type="button">Buscar actualizaciones</button>
+      </section>
+      <section class="nx-card">
+        <h2>Empresa</h2>
+        <dl>
+          <dt>Razón social</dt><dd id="e-name">…</dd>
+          <dt>RNC</dt><dd class="nx-num" id="e-rnc">…</dd>
+          <dt>Régimen</dt><dd id="e-regime">…</dd>
+          <dt>Caja</dt><dd class="nx-num" id="e-caja">…</dd>
+          <dt>Ambiente DGII</dt><dd class="nx-num" id="e-dgii">…</dd>
+        </dl>
+        <p class="nx-muted">Estos datos se cambian en <code>config.json</code> (luego tendrán su pantalla en Configuración).</p>
+      </section>
+    </div>
+    <p class="nx-muted">
+      Base v1 lista. La pantalla de Caja, el login y el módulo fiscal llegarán como actualizaciones con el botón
+      <strong>Actualizar</strong>, sin perder datos.
+    </p>
+  </main>
+
+  <footer class="nx-footer">
+    <span class="nx-num">NexoCaja © 2026 · Creado por <b>Erick Nex</b> · <b>NexTech</b><b class="nx-360">360</b> · <span id="f-version">v…</span></span>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "nexocaja",
+  "version": "1.0.0",
+  "description": "NexoCaja — Punto de Venta con módulo fiscal DGII (RD). Sin dependencias de npm.",
+  "private": true,
+  "type": "module",
+  "license": "SEE LICENSE IN LICENCIA.txt",
+  "author": "Erick Nex · NexTech360",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node server.js --open",
+    "manifest": "node make-manifest.js"
+  }
+}

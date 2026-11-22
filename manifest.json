@@ -1,0 +1,81 @@
+{
+  "version": "1.0.0",
+  "date": "2026-11-22",
+  "notes": [
+    "Primera version: base del sistema, base de datos por negocio y actualizacion con un boton"
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "sha256": "9e8403192f50412cbf8a9b8719dbdc763d5566a4e16b05d0f3ebf8108caca4b9"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "48dd199876ca55660494f2d4df50af92c2c4f242c4752f55a0020da4c84dad4c"
+    },
+    {
+      "path": "iniciar.bat",
+      "sha256": "62021b6a9c70789529289463341cf0cd64498a8ea02958c0bb81a97b55d5fa57"
+    },
+    {
+      "path": "instalar.bat",
+      "sha256": "e450499117754c29159ab0a4c6f9604c2ae40c2b570e3e43cfac164f37e8ba78"
+    },
+    {
+      "path": "LEEME-PRIMERO.txt",
+      "sha256": "ded4756545c8408fe94019ffc94f130a8811c522e735a2772e1d8d25dca9033d"
+    },
+    {
+      "path": "lib/config.js",
+      "sha256": "4d00cb9f2bbbd0ad9d3c9f22ccdb284c57a9d3d88116f90a3425818c53696514"
+    },
+    {
+      "path": "lib/db.js",
+      "sha256": "25468b6f2f9205dc488dd13e3aaeb10e98160a3a61fcd82cc8e78a415788c3c4"
+    },
+    {
+      "path": "lib/updater.js",
+      "sha256": "02133a146193ba339fa727f71a83378befa3d7443e89b8d63951816f91f31da6"
+    },
+    {
+      "path": "LICENCIA.txt",
+      "sha256": "ee160bdeb0b0404ff40c78ef0fd188523d1710724839b803235fabd7065ec781"
+    },
+    {
+      "path": "make-manifest.js",
+      "sha256": "11ad96648ad02e3156318c5e1dcdf3d5ba8374d3118c6ef66dced0f6b52d7345"
+    },
+    {
+      "path": "migraciones/001_init.sql",
+      "sha256": "426d5d49e863dbcfa36bc322d95970f57b4c2d9073cd484c77feca844ad729e3"
+    },
+    {
+      "path": "package.json",
+      "sha256": "468c1d878612d31a66e25dda362e437e28c6b0511ad0336d59276b31bee38f3b"
+    },
+    {
+      "path": "public/app.js",
+      "sha256": "1f410d964506f5b3ac47111079df25f58e161f293aaf7ade39b5ac07f0587d8a"
+    },
+    {
+      "path": "public/index.html",
+      "sha256": "85222d346ebcc0dedce0bf6c3aaaea9e9814f50021dcb0fea760feebd7e4755b"
+    },
+    {
+      "path": "public/styles.css",
+      "sha256": "aea44a3fc0aa40f858eb56753875c6c881eb1bcd94a490f6cc39940cdd53d314"
+    },
+    {
+      "path": "README.md",
+      "sha256": "4d9182a60681fab0c979408371c380303ee4ad21ae7449fb39f16eb0844ea4af"
+    },
+    {
+      "path": "reiniciar.bat",
+      "sha256": "54c200be887c88f2e849013c05b7a01a20f87e5f9b02f50d057b4ec6711b0321"
+    },
+    {
+      "path": "server.js",
+      "sha256": "96227e5a5e8b7bce6455185a3bea5b64c0beb80b0d840fbf8ec88dea4e41c9af"
+    }
+  ]
+}

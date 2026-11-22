@@ -1,0 +1,21 @@
+LICENCIA DE USO - NEXOCAJA
+Copyright (c) 2026 Erick Nex - NexTech360. Todos los derechos reservados.
+
+1. Esta copia de NexoCaja se entrega para uso de la persona o negocio
+   a quien Erick Nex se la entrega directamente.
+
+2. Esta prohibido:
+   - Vender, alquilar o sublicenciar NexoCaja o partes de su codigo.
+   - Redistribuirlo o presentarlo como propio.
+   - Quitar o modificar el credito "Creado por Erick Nex - NexTech360".
+
+3. NexoCaja se entrega "TAL CUAL", sin garantias de ningun tipo.
+   El autor no se hace responsable de perdidas de datos, multas,
+   recargos ni otros danos derivados de su uso. El usuario es
+   responsable de verificar sus comprobantes y declaraciones ante
+   la DGII y de conservar copias de seguridad de sus datos.
+
+4. Las actualizaciones que se publiquen quedan cubiertas por esta
+   misma licencia.
+
+Al instalar o usar NexoCaja aceptas estos terminos.
