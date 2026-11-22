@@ -1,0 +1,4 @@
+# Sin conversión de saltos de línea: los archivos en GitHub deben ser
+# byte a byte iguales a los de tu PC, o el SHA-256 del manifest no coincide
+# y la actualización diría "llegó dañado".
+* -text
