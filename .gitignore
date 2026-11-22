@@ -1,0 +1,41 @@
+# ── Ajustes y datos de cada usuario/negocio (NUNCA subir) ──
+config.json
+config.json.bak
+datos/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+respaldos/
+
+# ── Certificados y llaves DGII / firma digital ──
+*.p12
+*.pfx
+*.pem
+*.key
+*.crt
+*.cer
+certs/
+
+# ── Actualizador y temporales ──
+_update_tmp/
+*.new
+*.guardando
+errores.log
+*.log
+__pycache__/
+node_modules/
+
+# ── Privados del usuario ──
+cookies*.txt
+historial*
+.env
+.env.*
+
+# ── Sistema y editores ──
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
