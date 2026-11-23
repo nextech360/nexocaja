@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/t/:rnc/:path*", "destination": "/api/fe?rnc=:rnc&path=:path*" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }, { "key": "Cache-Control", "value": "no-store" }] }
+  ]
+}

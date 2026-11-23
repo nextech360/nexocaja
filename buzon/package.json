@@ -1,0 +1,8 @@
+{
+  "name": "nexocaja-buzon",
+  "private": true,
+  "type": "module",
+  "description": "Buzón e-CF de NexoCaja: recibe facturas electrónicas de suplidores (receptor DGII) para cada negocio",
+  "engines": { "node": "22.x" },
+  "dependencies": { "@vercel/blob": "^2.9.0" }
+}
