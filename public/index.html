@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NexoCaja · Punto de Venta</title>
-  <link rel="icon" href="/favicon.svg?v=1.1.0" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=1.1.0">
+  <link rel="icon" href="/favicon.svg?v=1.2.0" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css?v=1.2.0">
 </head>
 <body>
   <div id="app">
@@ -33,13 +33,19 @@
       <div class="nx-spacer"></div>
       <div class="nx-company">
         <strong id="company-name">…</strong>
-        <span>Le atiende: <b>Administrador</b></span>
+        <span>Le atiende: <b id="h-user"></b> <span id="h-role"></span></span>
+      </div>
+      <div class="nx-userbtns">
+        <button type="button" class="nx-btn nx-btn--sm" id="btn-mypin">Mi PIN</button>
+        <button type="button" class="nx-btn nx-btn--sm" id="btn-switch" title="Cerrar sesión y entrar con otro usuario">Cambiar usuario</button>
       </div>
     </header>
 
     <nav class="nx-modules" aria-label="Módulos">
       <a href="#/caja" data-route="caja" class="nx-btn"><kbd class="nx-key">F1</kbd>Ventas</a>
       <a href="#/productos" data-route="productos" class="nx-btn"><kbd class="nx-key">F3</kbd>Productos</a>
+      <a href="#/corte" data-route="corte" class="nx-btn"><kbd class="nx-key">F4</kbd>Corte de caja</a>
+      <a href="#/usuarios" data-route="usuarios" class="nx-btn" data-owner hidden>Usuarios</a>
       <a href="#/estado" data-route="estado" class="nx-btn">Estado del sistema</a>
     </nav>
 
@@ -52,19 +58,24 @@
         <span><b>Cambio:</b><span id="f-change" class="nx-num">$0.00</span></span>
       </div>
       <button id="btn-reprint" class="nx-btn nx-btn--sm" type="button">Reimprimir último ticket</button>
+      <button id="btn-sales-day" class="nx-btn nx-btn--sm" type="button">Ventas del día y anulaciones</button>
       <span id="f-today" class="nx-today"></span>
       <span class="nx-spacer"></span>
       <span class="nx-num nx-sign">NexoCaja © 2026 · Creado por <b>Erick Nex</b> · <b>NexTech</b><b class="nx-360">360</b> · <span id="f-version">v…</span></span>
     </footer>
   </div>
 
+  <div id="login-root" hidden></div>
   <div id="modal-root"></div>
   <div id="toast" class="nx-toast" role="status" hidden></div>
   <div id="print-area" aria-hidden="true"></div>
 
-  <script src="/app.js?v=1.1.0"></script>
-  <script src="/caja.js?v=1.1.0"></script>
-  <script src="/productos.js?v=1.1.0"></script>
+  <script src="/app.js?v=1.2.0"></script>
+  <script src="/caja.js?v=1.2.0"></script>
+  <script src="/productos.js?v=1.2.0"></script>
+  <script src="/acceso.js?v=1.2.0"></script>
+  <script src="/corte.js?v=1.2.0"></script>
+  <script src="/usuarios.js?v=1.2.0"></script>
   <script>NX.start();</script>
 </body>
 </html>

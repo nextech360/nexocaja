@@ -13,11 +13,12 @@ process.on('warning', (w) => {
   console.warn(w.message);
 });
 
-let dbMod, updater, api;
+let dbMod, updater, api, auth;
 try {
   dbMod = await import('./lib/db.js');
   updater = await import('./lib/updater.js');
   api = await import('./lib/api.js');
+  auth = await import('./lib/auth.js');
 } catch (err) {
   if (/sqlite/i.test(String(err.message))) {
     console.error('\n  Tu versión de Node.js es muy vieja para NexoCaja (necesita 22.13 o superior).');
@@ -136,6 +137,9 @@ async function handle(req, res) {
   if (pathname === '/api/update/apply' && req.method === 'POST') {
     if (!isLocal(req)) return json(res, 403, { error: 'Solo se puede actualizar desde la PC donde está instalado NexoCaja.' });
     if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) return json(res, 403, { error: 'Origen no permitido' });
+    const who = auth.currentUser(dbMod.getDb(), req);
+    if (!who) return json(res, 401, { error: 'Inicia sesión para actualizar.' });
+    if (!auth.can(who, 'actualizar')) return json(res, 403, { error: 'Solo el dueño o un supervisor puede actualizar NexoCaja.' });
     if (state.updating) return json(res, 409, { error: 'Ya se está actualizando.' });
     if (state.busy > 0) return json(res, 409, { error: 'Hay una venta en proceso. Espera a que termine para actualizar.' });
     state.updating = true;
@@ -185,7 +189,16 @@ async function handle(req, res) {
     }
     if (state.updating && req.method !== 'GET') return json(res, 503, { error: 'NexoCaja se está actualizando. Intenta en unos segundos.' });
     try {
-      const handled = await api.handleApi(req, res, pathname, searchParams, { db: dbMod.getDb(), json, readJson, state, isLocal: isLocal(req) });
+      const db = dbMod.getDb();
+      const ctx = { db, json, readJson, state, isLocal: isLocal(req), ip: req.socket.remoteAddress, registerId: cfg.caja };
+      if (pathname.startsWith('/api/auth/') || pathname.startsWith('/api/users')) {
+        ctx.user = pathname.startsWith('/api/users') ? auth.currentUser(db, req) : null;
+        const done = await auth.handleAuth(req, res, pathname, ctx);
+        if (done !== false) return;
+        return json(res, 404, { error: 'No encontrado' });
+      }
+      ctx.user = auth.currentUser(db, req);
+      const handled = await api.handleApi(req, res, pathname, searchParams, ctx);
       if (handled) return;
     } catch (err) {
       if (err.status) return json(res, err.status, { error: err.message });

@@ -33,12 +33,13 @@
         '<td class="c num">' + (p.taxRate ? p.taxRate + '%' : 'E') + '</td>' +
         '<td class="c num ' + cls + '">' + (p.trackStock ? NX.qty(p.stock) : 'Ilim') + '</td>' +
         '<td class="c num">' + (p.trackStock ? NX.qty(p.minStock) : '—') + '</td>' +
-        '<td class="r" style="white-space:nowrap"><button type="button" class="nx-btn nx-btn--sm" data-edit>Editar</button> ' +
-        '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-del>Eliminar</button></td></tr>';
+        '<td class="r" style="white-space:nowrap">' + (NX.can('productos.editar') ? '<button type="button" class="nx-btn nx-btn--sm" data-edit>Editar</button> ' +
+        '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-del>Eliminar</button>' : '') + '</td></tr>';
     }).join('');
     var empty = root.querySelector('[data-empty]');
     empty.hidden = list.length > 0;
     empty.innerHTML = items.length || filter.q ? 'No hay productos con ese filtro.'
+      : !NX.can('productos.editar') ? 'Todavía no hay productos. Pide a un supervisor que los agregue.'
       : 'Todavía no tienes productos. Agrega el primero con <b>Nuevo producto</b>, o carga <button type="button" class="nx-btn nx-btn--sm" data-demo>10 productos de ejemplo</button> para probar la caja.';
     var demo = empty.querySelector('[data-demo]');
     if (demo) demo.onclick = function () {
@@ -126,7 +127,7 @@
         '<div class="nx-page"><div class="nx-page-head"><h1>Productos e inventario</h1>' +
         '<input class="nx-search" type="search" placeholder="Buscar por nombre o código…" aria-label="Buscar productos" value="' + NX.esc(filter.q) + '">' +
         '<label class="nx-check"><input type="checkbox" data-low' + (filter.low ? ' checked' : '') + '> Solo inventario bajo</label>' +
-        '<span class="nx-spacer"></span><button type="button" class="nx-btn nx-btn--primary" data-new><kbd class="nx-key">INS</kbd>Nuevo producto</button></div>' +
+        '<span class="nx-spacer"></span>' + (NX.can('productos.editar') ? '<button type="button" class="nx-btn nx-btn--primary" data-new><kbd class="nx-key">INS</kbd>Nuevo producto</button>' : '<span class="nx-muted">Solo consulta</span>') + '</div>' +
         '<div class="nx-page-body"><div class="nx-alerts" data-alerts></div>' +
         '<div class="nx-tablebox"><table class="nx-table" style="min-width:1000px"><thead><tr>' +
         '<th>Código de barras</th><th>Interno</th><th>Descripción</th><th class="r">Costo</th><th class="r">Precio</th><th class="r">Mayoreo</th>' +
@@ -135,7 +136,7 @@
       var search = el.querySelector('.nx-search');
       search.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(function () { filter.q = search.value.trim(); load(); }, 200); });
       el.querySelector('[data-low]').addEventListener('change', function (e) { filter.low = e.target.checked; paint(); });
-      el.querySelector('[data-new]').addEventListener('click', function () { openForm(null); });
+      if (el.querySelector('[data-new]')) el.querySelector('[data-new]').addEventListener('click', function () { openForm(null); });
       el.querySelector('tbody').addEventListener('click', function (e) {
         var tr = e.target.closest('tr[data-id]'); if (!tr) return;
         var p = items.find(function (x) { return x.id === tr.getAttribute('data-id'); });
@@ -151,14 +152,14 @@
       });
       el.querySelector('tbody').addEventListener('dblclick', function (e) {
         var tr = e.target.closest('tr[data-id]'); if (!tr) return;
-        var p = items.find(function (x) { return x.id === tr.getAttribute('data-id'); }); if (p) openForm(p);
+        var p = items.find(function (x) { return x.id === tr.getAttribute('data-id'); }); if (p && NX.can('productos.editar')) openForm(p);
       });
       load();
       search.focus();
     },
     unmount: function () { root = null; },
     onKey: function (e) {
-      if (e.key === 'Insert') { e.preventDefault(); openForm(null); }
+      if (e.key === 'Insert' && NX.can('productos.editar')) { e.preventDefault(); openForm(null); }
     }
   });
 })();

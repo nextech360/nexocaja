@@ -31,10 +31,28 @@
     if (body !== undefined) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
     return fetch(url, opts).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok) throw new Error(d.error || ('Error ' + r.status));
+        if (r.status === 401 && url.indexOf('/api/auth/') !== 0 && NX.showLogin) NX.showLogin();
+        if (!r.ok) { var e = new Error(d.error || ('Error ' + r.status)); e.status = r.status; throw e; }
         return d;
       });
     });
+  };
+  /** Fechas de SQLite ("2026-11-22 23:10:00", UTC) o ISO → hora local legible. */
+  NX.date = function (v) {
+    if (!v) return '';
+    var s = String(v);
+    var d = new Date(/T/.test(s) ? s : s.replace(' ', 'T') + 'Z');
+    return isNaN(d) ? s : d.toLocaleString('es-DO', { dateStyle: 'short', timeStyle: 'short' });
+  };
+  NX.user = null;
+  var PERMS = {
+    cashier: ['vender', 'caja.abrir', 'caja.cerrar', 'caja.entrada', 'productos.ver'],
+    supervisor: ['vender', 'caja.abrir', 'caja.cerrar', 'caja.entrada', 'caja.salida', 'productos.ver', 'productos.editar', 'ventas.anular', 'costos.ver', 'actualizar'],
+    owner: ['*']
+  };
+  NX.can = function (perm) {
+    var p = NX.user ? PERMS[NX.user.role] || [] : [];
+    return p.indexOf('*') >= 0 || p.indexOf(perm) >= 0;
   };
   NX.store = {
     get: function (k, def) { try { var v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } },
@@ -117,6 +135,7 @@
 
   // ── Teclado global ─────────────────────────────────────────────
   document.addEventListener('keydown', function (e) {
+    if (!$('login-root').hidden && !modalStack.length) return; // en la pantalla de acceso no hay atajos
     var top = modalStack[modalStack.length - 1];
     if (top) {
       if (e.key === 'Escape') { e.preventDefault(); top.close(); return; }
@@ -126,6 +145,7 @@
     }
     if (e.key === 'F1') { e.preventDefault(); NX.go('caja'); return; }
     if (e.key === 'F3') { e.preventDefault(); NX.go('productos'); return; }
+    if (e.key === 'F4') { e.preventDefault(); NX.go('corte'); return; }
     if (current && current.view.onKey) current.view.onKey(e);
   });
 
@@ -148,16 +168,16 @@
   var METHOD_NAMES = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', transferencia: 'Transferencia', credito: 'Crédito' };
   NX.printSale = function (sale) {
     var c = (NX.info && NX.info.company) || {};
-    var d = new Date((sale.paidAt || sale.createdAt || '').replace(' ', 'T') + (/Z|[+-]\d\d:?\d\d$/.test(sale.paidAt || '') ? '' : 'Z'));
-    var when = isNaN(d) ? '' : d.toLocaleString('es-DO');
+    var when = NX.date(sale.paidAt || sale.createdAt);
     var h = '';
+    if (sale.status === 'anulada') h += '<div class="tk-center tk-big">*** VENTA ANULADA ***</div>';
     h += '<div class="tk-center tk-big">' + NX.esc(c.trade_name || 'NexoCaja') + '</div>';
     if (c.legal_name && c.legal_name !== c.trade_name) h += '<div class="tk-center">' + NX.esc(c.legal_name) + '</div>';
     if (c.rnc) h += '<div class="tk-center">RNC: ' + NX.esc(c.rnc) + '</div>';
     if (NX.info && NX.info.direccion) h += '<div class="tk-center">' + NX.esc(NX.info.direccion) + '</div>';
     if (NX.info && NX.info.telefono) h += '<div class="tk-center">Tel. ' + NX.esc(NX.info.telefono) + '</div>';
     h += '<hr class="tk-hr"><div class="tk-row"><span>Ticket ' + NX.esc(sale.folio) + '</span><span>' + NX.esc(NX.info ? NX.info.caja : '') + '</span></div>';
-    h += '<div>' + NX.esc(when) + '</div><hr class="tk-hr">';
+    h += '<div>' + NX.esc(when) + '</div>' + (sale.cashier ? '<div>Le atendió: ' + NX.esc(sale.cashier) + '</div>' : '') + '<hr class="tk-hr">';
     sale.lines.forEach(function (l) {
       h += '<div class="tk-item"><div>' + NX.esc(l.name) + (l.taxRate === 0 ? ' (E)' : '') + '</div>' +
         '<div class="tk-row"><span>' + NX.qty(l.qty) + ' x ' + NX.money(l.unitPrice) + (l.priceType === 'mayoreo' ? ' MAY' : '') + '</span><span>' + NX.money(l.lineTotal) + '</span></div>' +
@@ -268,11 +288,22 @@
   });
 
   // ── Arranque ───────────────────────────────────────────────────
+  var started = false;
+  /** Muestra el usuario en el encabezado y oculta lo que su rol no puede usar. */
+  NX.applyUser = function () {
+    var u = NX.user || {};
+    $('h-user').textContent = u.name || '';
+    $('h-role').textContent = u.roleName ? '(' + u.roleName + ')' : '';
+    document.querySelectorAll('[data-need]').forEach(function (el) { el.hidden = !NX.can(el.getAttribute('data-need')); });
+    document.querySelectorAll('[data-owner]').forEach(function (el) { el.hidden = u.role !== 'owner'; });
+  };
+  NX.resetView = function () { if (current && current.view.unmount) current.view.unmount(); current = null; $('view').innerHTML = ''; };
   NX.start = function () {
     wireUpdateBar();
     $('btn-reprint').addEventListener('click', function () {
       if (NX.lastSale) NX.printSale(NX.lastSale);
     });
+    $('btn-sales-day').addEventListener('click', function () { if (NX.openSalesDay) NX.openSalesDay(); });
     NX.api('GET', '/api/info').then(function (i) {
       NX.info = i;
       $('company-name').textContent = (i.company && i.company.trade_name) || '';
@@ -281,10 +312,14 @@
     }).catch(function () {
       NX.toast('No se pudo conectar con NexoCaja. ¿Está abierta la ventana negra (iniciar.bat)?', true);
     }).then(function () {
-      window.addEventListener('hashchange', route);
-      route();
+      NX.auth.boot(function () {
+        NX.applyUser();
+        if (!started) { started = true; window.addEventListener('hashchange', route); }
+        current = null;
+        route();
+        NX.refreshFooter();
+      });
     });
-    NX.refreshFooter();
     NX.checkUpdate(false);
     setInterval(function () { NX.checkUpdate(false); }, 6 * 60 * 60 * 1000);
   };

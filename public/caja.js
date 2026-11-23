@@ -330,6 +330,12 @@
         if (doPrint) NX.printSale(sale);
       }).catch(function (e) {
         busy = false; update();
+        if (e.status === 409 && /cerrada/.test(e.message)) {
+          close();
+          NX.toast(e.message, true);
+          if (viewEl) showClosed(viewEl);
+          return;
+        }
         err.textContent = e.message; err.hidden = false;
       });
     }
@@ -345,8 +351,30 @@
   }
 
   // ── Vista ──────────────────────────────────────────────────────
+  function showClosed(el) {
+    root = null;
+    el.innerHTML = '<div class="nx-closed"><div class="nx-closed-card"><h2>La caja está cerrada</h2>' +
+      '<p class="nx-muted" style="margin:0">Para vender, abre la caja con el efectivo del fondo inicial.</p>' +
+      '<button type="button" class="nx-btn nx-btn--ok" data-open style="height:48px;font-size:16px;justify-content:center">Abrir caja</button></div></div>';
+    el.querySelector('[data-open]').addEventListener('click', function () { NX.openShiftDialog(function () { mountCaja(el); }); });
+    el.querySelector('[data-open]').focus();
+  }
+
   NX.register('caja', {
     mount: function (el) {
+      viewEl = el;
+      el.innerHTML = '<div class="nx-empty">Cargando…</div>';
+      NX.api('GET', '/api/shift/current').then(function (r) {
+        if (viewEl !== el) return;
+        if (r.shift) mountCaja(el); else showClosed(el);
+      }).catch(function (x) { if (x.status !== 401) NX.toast(x.message, true); });
+    },
+    unmount: function () { root = null; viewEl = null; },
+    onKey: function (e) { if (root) cajaKeys(e); else if (/^F\d+$/.test(e.key) && e.key !== 'F5') e.preventDefault(); }
+  });
+
+  var viewEl = null;
+  function mountCaja(el) {
       root = el;
       el.innerHTML =
         '<div class="nx-band"><h1 data-band-title>VENTA</h1><span class="nx-chip nx-chip--warn" data-wholesale-chip hidden>MAYOREO ACTIVO</span>' +
@@ -359,6 +387,8 @@
         '<button type="button" class="nx-btn" data-buscar><kbd class="nx-key">F10</kbd>Buscar</button>' +
         '<button type="button" class="nx-btn" data-mayoreo aria-pressed="false"><kbd class="nx-key">F11</kbd>Mayoreo</button>' +
         '<button type="button" class="nx-btn" data-desc><kbd class="nx-key">F9</kbd>Descuento</button>' +
+        '<button type="button" class="nx-btn" data-in><kbd class="nx-key">F7</kbd>Entradas</button>' +
+        '<button type="button" class="nx-btn" data-out><kbd class="nx-key">F8</kbd>Salidas</button>' +
         '<button type="button" class="nx-btn nx-btn--danger" data-borrar><kbd class="nx-key">DEL</kbd>Borrar art.</button></div>' +
         '<div class="nx-ticketarea"><div class="nx-tabs" role="tablist" aria-label="Tickets" data-tabs></div>' +
         '<div class="nx-tablebox"><table class="nx-table"><thead><tr>' +
@@ -397,11 +427,13 @@
         var act = e.target.closest('[data-act]');
         if (act) changeQty(act.getAttribute('data-act') === 'inc' ? 1 : -1); else render();
       });
+      on('[data-in]', function () { NX.cashMove('entrada'); });
+      on('[data-out]', function () { NX.cashMove('salida'); });
       render();
       focusCode();
-    },
-    unmount: function () { root = null; },
-    onKey: function (e) {
+  }
+
+  function cajaKeys(e) {
       var inCode = document.activeElement && document.activeElement.id === 'codigo';
       var codeEmpty = !inCode || !document.activeElement.value;
       var typing = document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && !inCode;
@@ -412,6 +444,8 @@
         case 'F9': e.preventDefault(); cycleDiscount(); break;
         case 'F6': e.preventDefault(); hold(); break;
         case 'F12': e.preventDefault(); openCobro(); break;
+        case 'F7': e.preventDefault(); NX.cashMove('entrada'); break;
+        case 'F8': e.preventDefault(); NX.cashMove('salida'); break;
         case 'Insert': e.preventDefault(); openVarios(); break;
         case 'Delete': if (codeEmpty) { e.preventDefault(); removeSel(); } break;
         case 'ArrowDown': if (codeEmpty) { e.preventDefault(); st.sel = Math.min(st.sel + 1, ticket().lines.length - 1); render(); } break;
@@ -422,6 +456,5 @@
           if (/^F\d+$/.test(e.key) && e.key !== 'F5') e.preventDefault();
           else if (!inCode && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) focusCode(); // el escáner escribe aunque el foco esté fuera
       }
-    }
-  });
+  }
 })();

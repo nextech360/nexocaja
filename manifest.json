@@ -1,10 +1,11 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "date": "2026-11-23",
   "notes": [
-    "Pantalla de Caja: codigo de barras, F10 buscar, mayoreo, descuentos, tickets pendientes",
-    "Cobro con efectivo, tarjeta, transferencia o mixto y ticket de 80 mm",
-    "Productos e inventario con alertas de existencia baja"
+    "Acceso con PIN para cada usuario y cambio rapido de cajero",
+    "Roles: dueno, supervisor y cajero; anular ventas y sacar efectivo piden PIN de supervisor",
+    "Corte de caja: apertura con fondo, entradas y salidas (F7/F8), arqueo, cierre e impresion",
+    "Ventas del dia con reimpresion y anulacion"
   ],
   "files": [
     {
@@ -29,7 +30,11 @@
     },
     {
       "path": "lib/api.js",
-      "sha256": "30cdfd615cc544b7bc630f71fe0f83f09ef9eaecf8576b63ba2be9fad1b723ee"
+      "sha256": "a25f378757c36980dbe271d7848fc868070b5e5104aca6c4d86bcefefa62bee3"
+    },
+    {
+      "path": "lib/auth.js",
+      "sha256": "e2c0275bc82826bc452aef0e46af9af0835899bdc1a9359b5998e40b280f9914"
     },
     {
       "path": "lib/config.js",
@@ -60,16 +65,28 @@
       "sha256": "752b2a52639c27dbc784c44854351ffc1ce843e87ac36a175aa627659a17e3ee"
     },
     {
+      "path": "migraciones/003_usuarios_corte.sql",
+      "sha256": "95f90355a5c528822eaafcde8e74f3b1227bb1a5bedd29b3776a78e1a301d221"
+    },
+    {
       "path": "package.json",
-      "sha256": "ce33d3dafbc46946895c6267a27a83f383a54e20ce3c8a0311e3ec69aaa93b94"
+      "sha256": "075c7c1514ed97adc5fa06b0aae203694df5592f92e5651180e70685c35c7d8d"
+    },
+    {
+      "path": "public/acceso.js",
+      "sha256": "aa66aa2b556d06053ff77576ab7ccf397208eb94979f5e1e894cf9e42aa3ea40"
     },
     {
       "path": "public/app.js",
-      "sha256": "c1e800ea06bf24783e5f4f20d07f7ee9a242d7e5b7a70052b297ac3fbb97eca3"
+      "sha256": "d4381408eae87692ec8d2220663d920a3e8fdda79e9f65f977daa25120ddfe43"
     },
     {
       "path": "public/caja.js",
-      "sha256": "a54b1d0d27f32c97cc9b5868d0ee871d434b3759a8304a968e7c5033a057e39a"
+      "sha256": "2446b2ac44a9dfd3d8e170bebcd6eec7016e3200093ee6681bd7dbb77e0514ff"
+    },
+    {
+      "path": "public/corte.js",
+      "sha256": "c03240508040699d5ce315d1668cdf3fc4e4f883f073bdcabffce2bcc2398a35"
     },
     {
       "path": "public/favicon.svg",
@@ -77,15 +94,19 @@
     },
     {
       "path": "public/index.html",
-      "sha256": "cd6c494f38a46d4fe33d36c20a1d03e7b05feac73682a73f358db8593b10364a"
+      "sha256": "c2873b0039c27e73324b38c785dd7505701a78164a008123ef2de1e26cd2e7da"
     },
     {
       "path": "public/productos.js",
-      "sha256": "9244bc76162a618f4d2bd2b1c4a8023335c8d24487f84bf9173e30a5c2891e54"
+      "sha256": "55f5a185305628976c600635f10090ba84b8c3fc5a1fe7fd45ecbfcd3c1c867e"
     },
     {
       "path": "public/styles.css",
-      "sha256": "1ef9d551f0a48d70d76f53b4b4bb44aa832343bb67c99a115c727b684af2311d"
+      "sha256": "861b016ac401fcfe34cc92f80b7435f12d74b9203fd8606226c106141613faab"
+    },
+    {
+      "path": "public/usuarios.js",
+      "sha256": "37212c6b96d9f8ff94f9e9924dfcf41b7f800fc7a65ebd5283343263583f8f5a"
     },
     {
       "path": "README.md",
@@ -97,7 +118,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "60b8daf87550f0a74754224ecade75dfcc6b6c9250a4c6f4b1b2bb640d968214"
+      "sha256": "677a14f9e235d755cc914474f4d62a0fc7f0cea773ee2176b99a265929785a99"
     }
   ]
 }
