@@ -40,7 +40,7 @@ After=network-online.target
 
 [Service]
 WorkingDirectory=/opt/nexocaja
-ExecStart=/opt/nexocaja/iniciar.sh
+ExecStart=/bin/sh /opt/nexocaja/iniciar.sh
 Restart=always
 User=nexocaja
 
