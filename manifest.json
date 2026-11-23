@@ -1,13 +1,8 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "date": "2026-11-23",
   "notes": [
-    "Envio de e-CF a la DGII: autenticacion con tu certificado, TrackId y consulta de estado",
-    "Facturas de Consumo menores de RD$250,000 se envian como Resumen (RFCE)",
-    "Contingencia: si no hay internet se sigue vendiendo y se envia solo al volver (plazo 72 h)",
-    "Nueva pantalla Comprobantes e-CF: pendientes, aceptados, rechazados, bitacora y reemision",
-    "Indicador de estado e-CF en la parte de arriba y boton Probar conexion",
-    "Ambiente de Produccion habilitado"
+    "Pie de pagina: queda solo la marca NexTech360"
   ],
   "files": [
     {
@@ -136,7 +131,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "0d3f0b3d46b3f0707e06c506fbdf059b1cc3ca086fd62e8826fba12fb130656f"
+      "sha256": "833fdf96e3cbe06b40f3d881017d25ab48fef9fd60ebc44e87cedbd9de26855e"
     },
     {
       "path": "public/acceso.js",
@@ -172,7 +167,7 @@
     },
     {
       "path": "public/index.html",
-      "sha256": "7f835af117fcd10d48adfc460c0fdae0bba4c2ed0a221200ee70cd32a8713b92"
+      "sha256": "7f38ddd4b64cc38a071dfc2e6db6e2d3791a998398e2537a89babdf4cfd73218"
     },
     {
       "path": "public/productos.js",
