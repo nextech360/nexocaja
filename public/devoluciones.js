@@ -13,8 +13,9 @@
     if (c.legal_name && c.legal_name !== c.trade_name) h += '<div class="tk-center">' + NX.esc(c.legal_name) + '</div>';
     if (c.rnc) h += '<div class="tk-center">RNC: ' + NX.esc(c.rnc) + '</div>';
     if (NX.info && NX.info.direccion) h += '<div class="tk-center">' + NX.esc(NX.info.direccion) + '</div>';
-    h += '<hr class="tk-hr"><div class="tk-center tk-big">' + (n.ncf ? 'NOTA DE CRÉDITO' : 'DEVOLUCIÓN') + '</div>';
-    if (n.ncf) {
+    if (n.ecf) h += '<hr class="tk-hr">' + NX.ecfHeader(n.ecf);
+    else h += '<hr class="tk-hr"><div class="tk-center tk-big">' + (n.ncf ? 'NOTA DE CRÉDITO' : 'DEVOLUCIÓN') + '</div>';
+    if (n.ncf && !n.ecf) {
       h += row('NCF:', NX.esc(n.ncf)) + (n.ncfExpiresOn ? row('Válido hasta:', NX.esc(n.ncfExpiresOn.split('-').reverse().join('/'))) : '');
       if (n.ncfModified) h += row('NCF modificado:', NX.esc(n.ncfModified));
     }
@@ -29,7 +30,7 @@
       '<div class="tk-row tk-total"><span>TOTAL DEVUELTO</span><span>' + NX.money(n.total) + '</span></div>' +
       row('Devuelto en', REFUND[n.refundMethod] || n.refundMethod);
     if (!n.itbisApplies) h += '<div style="margin-top:4px">Emitida después de 30 días de la factura: no rebaja el ITBIS.</div>';
-    h += '<div style="margin-top:4px">Motivo: ' + NX.esc(n.reason) + '</div><hr class="tk-hr">' +
+    h += '<div style="margin-top:4px">Motivo: ' + NX.esc(n.reason) + '</div>' + (n.ecf ? NX.ecfFooter(n.ecf) : '') + '<hr class="tk-hr">' +
       '<div class="tk-center">Firma del cliente: ____________________</div>';
     if (!n.ncf) h += '<div class="tk-center">DOCUMENTO NO VÁLIDO COMO COMPROBANTE FISCAL</div>';
     h += '<div class="tk-center" style="margin-top:4px">NexoCaja · NexTech360</div>';
@@ -47,7 +48,7 @@
       html: '<div class="nx-modal-body">' +
         '<div class="nx-muted" style="font-size:13px">' + NX.esc(NX.date(sale.paidAt)) + (sale.ncf ? ' · NCF ' + NX.esc(sale.ncf) : '') + (sale.customerName ? ' · ' + NX.esc(sale.customerName) : '') + ' · Total ' + NX.money(sale.total) + '</div>' +
         (fiscal ? (sale.itbisApplies
-          ? '<div class="nx-result nx-result--info" style="font-size:13px">Se emitirá una Nota de Crédito (B04) que modifica el NCF ' + NX.esc(sale.ncf) + '. Han pasado ' + sale.daysSince + ' día(s): la nota rebaja el ITBIS.</div>'
+          ? '<div class="nx-result nx-result--info" style="font-size:13px">Se emitirá una Nota de Crédito (' + (sale.ncf[0] === 'E' ? 'E34 electrónica' : 'B04') + ') que modifica el ' + (sale.ncf[0] === 'E' ? 'e-NCF ' : 'NCF ') + NX.esc(sale.ncf) + '. Han pasado ' + sale.daysSince + ' día(s): la nota rebaja el ITBIS.</div>'
           : '<div class="nx-result nx-result--warn" style="font-size:13px">Han pasado ' + sale.daysSince + ' días desde la factura (más de ' + sale.itbisDays + '): la Nota de Crédito se emite sin ITBIS, así que no rebaja el impuesto ya declarado.</div>')
           : '<div class="nx-result nx-result--info" style="font-size:13px">Esta venta no tiene NCF: se hará una devolución interna (sin comprobante fiscal).</div>') +
         '<div class="nx-tablebox" style="max-height:300px"><table class="nx-table"><thead><tr><th>Producto</th><th class="r">Vendido</th><th class="r">Ya devuelto</th><th class="r">Precio</th><th class="r" style="width:180px">A devolver</th><th class="r">Importe</th></tr></thead><tbody>' +

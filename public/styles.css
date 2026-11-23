@@ -257,3 +257,5 @@ input, select { font: inherit; color: inherit; }
 
 /* ── Devoluciones (1.4.0) ───────────────────────── */
 .nx-table tr.is-bad input { border-color: #dc2626; background: #fef2f2; }
+#print-area .tk-qr { display: flex; justify-content: center; margin: 4px 0; }
+#print-area .tk-qr svg { width: 34mm; height: 34mm; }

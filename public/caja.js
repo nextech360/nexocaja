@@ -77,7 +77,14 @@
     save();
   }
 
-  function fiscalOn() { var st0 = NX.fiscal.status; return !!(st0 && st0.mode === 'NCF'); }
+  function fiscalOn() { var st0 = NX.fiscal.status; return !!(st0 && (st0.mode === 'NCF' || st0.mode === 'ECF')); }
+  /** Tipo de comprobante del ticket; si no vale en el modo actual (p. ej. B02 al pasar a e-CF), el primero disponible. */
+  function curType(t) {
+    var st0 = NX.fiscal.status;
+    if (!st0 || !st0.types.length) return t.ncfType || '02';
+    return st0.types.some(function (x) { return x.code === t.ncfType; }) ? t.ncfType : st0.types[0].code;
+  }
+  function isConsumo(code) { return code === '02' || code === '32'; }
   function paintFiscal(t) {
     var stt = NX.fiscal.status;
     var chip = root.querySelector('[data-doc-chip]');
@@ -89,14 +96,16 @@
       ' <button type="button" class="nx-btn nx-btn--sm" data-cust><kbd class="nx-key">F2</kbd>' + (t.customer ? 'Cambiar' : 'Elegir cliente') + '</button>' +
       (t.customer ? ' <button type="button" class="nx-btn nx-btn--sm" data-nocust>Quitar</button>' : '');
     if (fiscalOn()) {
-      var type = t.ncfType || '02';
+      var type = curType(t);
+      var pre = stt.kind === 'ECF' ? 'E' : 'B';
       html += '<span class="nx-spacer"></span><span class="nx-fb-label">Comprobante:</span><span role="group" aria-label="Tipo de comprobante" class="nx-fb-types">' +
         stt.types.map(function (ty) {
           return '<button type="button" class="nx-btn nx-btn--sm" data-ncf="' + ty.code + '" aria-pressed="' + (ty.code === type) + '"' + (ty.available ? '' : ' disabled title="Sin secuencia disponible"') + '>' +
-            NX.esc(ty.name) + ' <span class="nx-num" style="font-size:11px">B' + ty.code + (ty.available ? ' · ' + ty.remaining : ' · 0') + '</span></button>';
+            NX.esc(stt.kind === 'ECF' ? ty.short : ty.name) + ' <span class="nx-num" style="font-size:11px">' + pre + ty.code + (ty.available ? ' · ' + ty.remaining : ' · 0') + '</span></button>';
         }).join('') + '</span>';
       var cur = stt.types.find(function (x) { return x.code === type; }) || {};
-      chip.textContent = (NX.NCF_NAMES[type] || '') + (cur.nextNcf ? ' · próximo NCF ' + cur.nextNcf : ' · SIN NCF DISPONIBLE');
+      chip.textContent = (NX.NCF_NAMES[type] || '') + (cur.nextNcf ? ' · próximo ' + (stt.kind === 'ECF' ? 'e-NCF ' : 'NCF ') + cur.nextNcf : ' · SIN COMPROBANTES DISPONIBLES') +
+        (stt.kind === 'ECF' && stt.ambiente !== 'eCF' ? ' · PRUEBAS' : '');
       chip.className = 'nx-chip' + (cur.available ? '' : ' nx-chip--warn');
     } else {
       chip.textContent = 'Ticket de venta (sin comprobante fiscal)';
@@ -112,7 +121,7 @@
   /** Revisa en la caja lo que el servidor exigiría, para avisar antes de abrir el cobro. */
   function fiscalProblem(t) {
     if (!fiscalOn()) return '';
-    var type = t.ncfType || '02';
+    var type = curType(t);
     var ty = NX.fiscal.status.types.find(function (x) { return x.code === type; });
     if (!ty || !ty.available) return 'No hay NCF de ' + (ty ? ty.name : 'ese tipo') + ' disponibles. El dueño debe registrar una secuencia en Configuración fiscal.';
     if (ty.needsDoc && !(t.customer && t.customer.docNumber)) return 'La ' + NX.NCF_NAMES[type] + ' necesita un cliente con RNC o cédula.';
@@ -287,10 +296,10 @@
     var problem = fiscalProblem(t);
     if (problem) { NX.toast(problem, true); if (/cliente/.test(problem)) chooseCustomer(); return; }
     var payload = { lines: linesPayload(t), wholesale: !!t.wholesale };
-    if (fiscalOn()) payload.ncfType = t.ncfType || '02';
+    if (fiscalOn()) payload.ncfType = curType(t);
     if (t.customer) payload.customerId = t.customer.id;
     NX.api('POST', '/api/sales/quote', payload).then(function (q) {
-      if (fiscalOn() && payload.ncfType === '02' && q.total >= NX.fiscal.status.consumoThreshold && !(t.customer && t.customer.docNumber)) {
+      if (fiscalOn() && isConsumo(payload.ncfType) && q.total >= NX.fiscal.status.consumoThreshold && !(t.customer && t.customer.docNumber)) {
         NX.toast('Las facturas de consumo de RD$250,000 o más deben identificar al comprador. Elige el cliente con F2.', true);
         chooseCustomer(); return;
       }

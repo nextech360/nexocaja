@@ -1,12 +1,12 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "date": "2026-11-23",
   "notes": [
-    "Devoluciones con Nota de Credito B04 (parcial o total), con autorizacion de supervisor",
-    "Regla de 30 dias: despues de ese plazo la nota se emite sin ITBIS",
-    "Reportes DGII: formato 607 (ventas) y 608 (NCF anulados) en TXT listo para pre-validar",
-    "Al anular una venta con NCF se elige el tipo de anulacion del 608",
-    "El corte de caja descuenta las devoluciones en efectivo"
+    "Facturacion electronica (e-CF): firma digital XMLDSig con tu certificado .p12 / .pfx",
+    "Factura de Consumo, Credito Fiscal y Gubernamental electronicas (E32, E31, E45) desde la caja",
+    "Nota de Credito electronica (E34) en devoluciones",
+    "Factura impresa con codigo QR, codigo de seguridad y fecha de firma",
+    "Ambiente de pruebas TesteCF / CerteCF: el envio a la DGII llega en la 1.6.0"
   ],
   "files": [
     {
@@ -31,7 +31,7 @@
     },
     {
       "path": "lib/api.js",
-      "sha256": "74df78addda176e5e8b060ccdae17de3755c43c627ee82db9127ba6133152993"
+      "sha256": "03ad9cce471ad31b47418a3370c024b1ac8ccbbba30e59fe3cd15e2dfb8aa840"
     },
     {
       "path": "lib/auth.js",
@@ -47,11 +47,31 @@
     },
     {
       "path": "lib/devoluciones.js",
-      "sha256": "634971ab86db31f1027536621124426cb350824b3a8814fb540ee567601ffeb7"
+      "sha256": "04cef5a7ef46196e4ae0bcc843fe9944101896c1ac4cdba4911f811043fb0893"
+    },
+    {
+      "path": "lib/ecf/catalogo.js",
+      "sha256": "036a9acc5f236100de02d3bcd5d10e2f0d9e055463b5721eae4ebcadf2413110"
+    },
+    {
+      "path": "lib/ecf/emision.js",
+      "sha256": "db1a16d93cdb269a648657328476bbe66a3a0b5d01c628cbd15bd726c9480026"
+    },
+    {
+      "path": "lib/ecf/firma.js",
+      "sha256": "e43d5d7597b978e69e14c92c261175ff9677878fecb9aec9bb36d399fdab4033"
+    },
+    {
+      "path": "lib/ecf/p12.js",
+      "sha256": "7cce09e36592ec231e02a09b15c2f980fefe383cb57efaf8baf84020da0ee6c6"
+    },
+    {
+      "path": "lib/ecf/xml.js",
+      "sha256": "31aa3a5269d4517f1cbba3764d10321f3f294a62e0557a3c1d39013a5919162f"
     },
     {
       "path": "lib/fiscal.js",
-      "sha256": "757ab8537341037a3cb7b92f15d500e87158ddd794ebf083572b95348d67514b"
+      "sha256": "572f0a09273310747478ffd42d2fd778919246d3fa525d9d2066f5c012833a75"
     },
     {
       "path": "lib/rd.js",
@@ -59,7 +79,7 @@
     },
     {
       "path": "lib/reportes.js",
-      "sha256": "6aa99963595ccc971ba54636c16c77f2643422c7dbd7853ba85b21563650acba"
+      "sha256": "ffe3fc1e3a9aa0dfaa4390f0324ea8ba12d4ec0f5e9415658bd5cff4d4dc4a21"
     },
     {
       "path": "lib/updater.js",
@@ -94,20 +114,24 @@
       "sha256": "90fda9189c4dd7626331edc05bf6dd7ca2b9e0b65342e847e2adc3fc1f9ce711"
     },
     {
+      "path": "migraciones/006_ecf.sql",
+      "sha256": "718bba8d806347545b27cc0fd979da8de51901775c0178f7963d0206987f9185"
+    },
+    {
       "path": "package.json",
-      "sha256": "89a2671cc471938940fe61250a0a46ca8f2afe2ec18700e174149d39b017c2f5"
+      "sha256": "b2e08f5b5060f4c648d0fa3d259f9f86db0b53fc411b8f64b0553e4a4cb03455"
     },
     {
       "path": "public/acceso.js",
-      "sha256": "0d686deeab8b1c56fac89d7208f6ee78f031cd5d79768f09458ec2a54428c7b4"
+      "sha256": "26e482040db95552d27cffc0fa319273daef2c37bdcecc8409d2c7445688617e"
     },
     {
       "path": "public/app.js",
-      "sha256": "264d5ff9ef4913da665c4e0c0a81d48e0885369826812c4d7c36712ef91eec97"
+      "sha256": "c7558130658a4077080b171e6910853a9b24663eb199940a80b678b67a819b38"
     },
     {
       "path": "public/caja.js",
-      "sha256": "e2c36c61044f7be6f07bff8944ff5574ec3b0f4359d1877ccf17173e701f027c"
+      "sha256": "c7a550c111820118982b56706099eac5d573f00e3a69944732075a821325cf51"
     },
     {
       "path": "public/corte.js",
@@ -115,7 +139,7 @@
     },
     {
       "path": "public/devoluciones.js",
-      "sha256": "8a8d3d53f561507e8cfff4d1a6c3d1e9aab4b1ae3ea4bf6807d0dc437d8add78"
+      "sha256": "29c51467fa86a4217242f4ea8da1b8c4fee68c68791b4a3c07e6f9cdfa47064d"
     },
     {
       "path": "public/favicon.svg",
@@ -123,15 +147,19 @@
     },
     {
       "path": "public/fiscal.js",
-      "sha256": "fcdf64f828f4e029df8fe93e03e27abf6713cfc13647317926a51fbe8398bbea"
+      "sha256": "f07bc46011dfbc31a23e5682f7bcf864bb998e3a4880eadf16c303adb05f8b03"
     },
     {
       "path": "public/index.html",
-      "sha256": "102d6acfa0150d6b2ffc7ff3d6fdae438262cb7270e4d1c1129f38fc8e8c726a"
+      "sha256": "3bab8cf3e8061fccf61565ba5fe6c21a43d66ecd86f20796e0b4ba1252cee5a0"
     },
     {
       "path": "public/productos.js",
       "sha256": "55f5a185305628976c600635f10090ba84b8c3fc5a1fe7fd45ecbfcd3c1c867e"
+    },
+    {
+      "path": "public/qr.js",
+      "sha256": "6b0b251ad9d904502be1c2f4f776932564f88576a2de0cfb90d575b44460df3d"
     },
     {
       "path": "public/reportes.js",
@@ -139,7 +167,7 @@
     },
     {
       "path": "public/styles.css",
-      "sha256": "696466f130cdaa0eee0f8c6c0d99cf8c328141a71a8502c42b323c47f850fb6a"
+      "sha256": "b33a66aa62750bc09f8bb56e5b04ed75739522ea80526c424788b032e91f971b"
     },
     {
       "path": "public/usuarios.js",
@@ -155,7 +183,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "23e6ba26b5a7c57fbb55c6a4f80ec0564bd1458bd384d6f55d232f4fc9d3d041"
+      "sha256": "a918ae614fa78cbb46190e9ea8cd152d89a7c620c8577c87ed9bc65ccec31918"
     }
   ]
 }

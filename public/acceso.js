@@ -211,7 +211,7 @@
             '<td class="c"><span class="nx-status ' + (cancelled ? 'nx-status--bad' : full || part ? 'nx-status--muted' : 'nx-status--ok') + '">' + (cancelled ? 'Anulada' : full ? 'Devuelta' : part ? 'Dev. parcial' : 'Pagada') + '</span></td>' +
             '<td class="r" style="white-space:nowrap;text-decoration:none"><button type="button" class="nx-btn nx-btn--sm" data-print>Reimprimir</button> ' +
             (cancelled || full ? '' : '<button type="button" class="nx-btn nx-btn--sm" data-return>Devolver</button> ') +
-            (cancelled || s.returned ? '' : '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-cancel data-ncf="' + NX.esc(s.ncf || '') + '">Anular</button>') + '</td></tr>';
+            (cancelled || s.returned || (s.ncf && s.ncf[0] === 'E') ? '' : '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-cancel data-ncf="' + NX.esc(s.ncf || '') + '">Anular</button>') + '</td></tr>';
         }).join('');
       }).catch(function (x) { NX.toast(x.message, true); });
     }

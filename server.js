@@ -48,6 +48,7 @@ process.on('unhandledRejection', (e) => { logError(e); console.error(e); });
 dbMod.openDb(cfg, VERSION);
 dbMod.migrate((m) => console.log(m));
 dbMod.seedCompany(cfg);
+(await import('./lib/ecf/emision.js')).initEcf(cfg);
 
 // ── Estado de trabajos ───────────────────────────────────────────
 // Cuando existan ventas/cobros, cada operación en curso hace busy++ / busy--.
