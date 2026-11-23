@@ -39,34 +39,61 @@
   function card(label, n, cls, f) {
     return '<button type="button" class="nx-card nx-ecf-card' + (filtro === f ? ' is-on' : '') + '" data-f="' + f + '"><span class="nx-muted">' + label + '</span><b class="num ' + (cls || '') + '">' + n + '</b></button>';
   }
+  function loadRecibidos() {
+    NX.api('GET', '/api/ecf/recibidos').then(function (rows) {
+      if (!root) return;
+      root.querySelectorAll('[data-f]').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-f') === 'recibidos'); });
+      root.querySelector('thead tr').innerHTML = '<th>Suplidor</th><th>e-NCF</th><th>Emitida</th><th class="r">ITBIS</th><th class="r">Total</th><th>Recibida</th><th></th>';
+      root.querySelector('[data-empty]').hidden = rows.length > 0;
+      root.querySelector('[data-empty]').textContent = 'Todavía no han llegado facturas electrónicas de suplidores. Activa el Buzón en Configuración fiscal.';
+      root.querySelector('tbody').innerHTML = rows.map(function (r) {
+        return '<tr><td><b>' + NX.esc(r.razonSocial || '') + '</b><br><small class="nx-muted num">RNC ' + NX.esc(r.rncEmisor) + '</small></td><td class="num">' + NX.esc(r.encf) + '<br><small class="nx-muted">' + (TIPOS[r.tipo] || r.tipo || '') + '</small></td>' +
+          '<td>' + NX.esc(r.fechaEmision || '') + '</td><td class="r num">' + NX.money(r.itbis || 0) + '</td><td class="r num">' + NX.money(r.total || 0) + '</td><td>' + NX.esc(NX.date(r.recibidoAt)) + '</td>' +
+          '<td class="r" style="white-space:nowrap"><a class="nx-btn nx-btn--sm" href="/api/ecf/recibidos/' + encodeURIComponent(r.id) + '/xml" download>XML</a> <a class="nx-btn nx-btn--sm" href="/api/ecf/recibidos/' + encodeURIComponent(r.id) + '/acuse" download>Acuse</a></td></tr>';
+      }).join('');
+    }).catch(function (x) { NX.toast(x.message, true); });
+  }
+  var HEAD = '<th>e-NCF</th><th>Tipo</th><th class="r">Total</th><th>Firmado</th><th>Estado DGII</th><th></th>';
   function load() {
     if (!root) return;
+    if (filtro === 'recibidos') {
+      NX.api('GET', '/api/ecf/docs?limit=1').then(function (r) { paintCards(r.summary); loadRecibidos(); });
+      return;
+    }
+    root.querySelector('thead tr').innerHTML = HEAD;
+    root.querySelector('[data-empty]').textContent = 'No hay comprobantes en esta lista.';
     var q = busca ? '?q=' + encodeURIComponent(busca) : filtro ? '?estado=' + filtro : '';
     NX.api('GET', '/api/ecf/docs' + q).then(function (r) {
       if (!root) return;
-      docs = r.docs; var s = r.summary;
+      docs = r.docs; paintCards(r.summary);
+      root.querySelector('[data-empty]').hidden = docs.length > 0;
+      paintRows();
+    }).catch(function (x) { NX.toast(x.message, true); });
+  }
+  function paintCards(s) {
       paintPill(s);
       root.querySelector('[data-cards]').innerHTML =
         card('Todos', '—', '', '') + card('Pendientes de envío', s.porEnviar + s.enProceso, s.porEnviar ? 'nx-diff-bad' : '', 'pendientes') +
-        card('Aceptados', s.aceptados, 'nx-diff-ok', 'aceptados') + card('Rechazados', s.rechazados, s.rechazados ? 'nx-diff-bad' : '', 'rechazado');
+        card('Aceptados', s.aceptados, 'nx-diff-ok', 'aceptados') + card('Rechazados', s.rechazados, s.rechazados ? 'nx-diff-bad' : '', 'rechazado') +
+        card('Recibidos de suplidores', '↓', '', 'recibidos');
       var warn = '';
       if (s.offline) warn += '<div class="nx-error">' + NX.esc(s.ultimoErrorRed || 'Sin conexión con la DGII') + '. Sigue vendiendo: los e-CF quedan en contingencia y se envían solos al volver internet. Plazo: 72 horas.</div>';
       if (s.authError) warn += '<div class="nx-error">' + NX.esc(s.authError) + '</div>';
       root.querySelector('[data-warn]').innerHTML = warn;
-      root.querySelector('[data-empty]').hidden = docs.length > 0;
+  }
+  function paintRows() {
       root.querySelector('tbody').innerHTML = docs.map(function (d) {
         var msg = d.mensajes && d.mensajes.length ? '<br><small class="' + (d.estado === 'rechazado' ? 'nx-diff-bad' : 'nx-muted') + '">' + NX.esc(d.mensajes.map(function (m) { return (m.codigo ? m.codigo + ': ' : '') + m.valor; }).join(' · ')).slice(0, 220) + '</small>' : '';
         return '<tr data-encf="' + NX.esc(d.encf) + '"><td class="num"><b>' + NX.esc(d.encf) + '</b>' + (d.referencia ? '<br><small class="nx-muted">modifica ' + NX.esc(d.referencia) + '</small>' : '') + '</td>' +
           '<td>' + (TIPOS[d.tipo] || d.tipo) + '<br><small class="nx-muted">' + (d.ruta === 'RFCE' ? 'Resumen (RFCE)' : 'e-CF completo') + ' · ' + NX.esc(d.ambiente) + '</small></td>' +
           '<td class="r num">' + NX.money(d.total) + '</td><td>' + NX.esc(d.fechaFirma || '') + '</td>' +
           '<td><span class="nx-status ' + (CLASE[d.estado] || 'nx-status--muted') + '">' + NX.esc(d.estadoNombre) + '</span>' +
-          (d.contingencia ? ' <span class="nx-tag">contingencia</span>' : '') + (d.reemplazadoPor ? '<br><small>Reemitido como <b class="num">' + NX.esc(d.reemplazadoPor) + '</b></small>' : '') + msg + '</td>' +
+          (d.contingencia ? ' <span class="nx-tag">contingencia</span>' : '') + (d.aprobacionComercial ? ' <span class="nx-tag">cliente: ' + NX.esc(d.aprobacionComercial) + '</span>' : '') + (d.reemplazadoPor ? '<br><small>Reemitido como <b class="num">' + NX.esc(d.reemplazadoPor) + '</b></small>' : '') + msg + '</td>' +
           '<td class="r" style="white-space:nowrap"><button type="button" class="nx-btn nx-btn--sm" data-det>Detalle</button> ' +
           '<a class="nx-btn nx-btn--sm" href="/api/fiscal/ecf/' + encodeURIComponent(d.encf) + '/xml" download>XML</a>' +
           (['firmado', 'en_cola', 'en_proceso', 'enviado'].indexOf(d.estado) >= 0 ? ' <button type="button" class="nx-btn nx-btn--sm" data-retry>Reintentar</button>' : '') +
           (d.estado === 'rechazado' && !d.reemplazadoPor ? ' <button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-reissue>Reemitir</button>' : '') + '</td></tr>';
       }).join('');
-    }).catch(function (x) { NX.toast(x.message, true); });
   }
   function detail(encf) {
     NX.api('GET', '/api/ecf/docs/' + encodeURIComponent(encf)).then(function (d) {

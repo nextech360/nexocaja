@@ -1,8 +1,11 @@
 {
-  "version": "1.6.1",
+  "version": "1.7.0",
   "date": "2026-11-23",
   "notes": [
-    "Pie de pagina: queda solo la marca NexTech360"
+    "Buzon e-CF: recibe facturas electronicas de tus suplidores con acuse de recibo firmado, aunque la PC este apagada",
+    "Pantalla Comprobantes e-CF: pestaña Recibidos de suplidores con XML y acuse",
+    "Aprobacion comercial de tus clientes visible en cada factura",
+    "Activacion con codigo desde Configuracion fiscal; se puede desactivar y borrar la copia del certificado"
   ],
   "files": [
     {
@@ -46,6 +49,10 @@
       "sha256": "04cef5a7ef46196e4ae0bcc843fe9944101896c1ac4cdba4911f811043fb0893"
     },
     {
+      "path": "lib/ecf/buzon.js",
+      "sha256": "671a162e3faa705f27603a2ff0a440e7b00985e1606a2c473fa5d2a36f4ff1be"
+    },
+    {
       "path": "lib/ecf/catalogo.js",
       "sha256": "036a9acc5f236100de02d3bcd5d10e2f0d9e055463b5721eae4ebcadf2413110"
     },
@@ -59,7 +66,7 @@
     },
     {
       "path": "lib/ecf/emision.js",
-      "sha256": "cc26961bfc97006a5a98a246666fd5f8edf649b1b8c32ebdf66ded3a88dd1732"
+      "sha256": "5bcd72d0d68cec7d89219ad373312e1e62f6eefca7bfa3b6efb0222834ebc36e"
     },
     {
       "path": "lib/ecf/firma.js",
@@ -71,7 +78,7 @@
     },
     {
       "path": "lib/ecf/rutas.js",
-      "sha256": "16413d25dd3e879cfba7c985f7462675568ae61d1370738f8dd46b452e6e146e"
+      "sha256": "17b8f55173dc2008ef9906772c1e164c2453cbaa9ca7e50f38b952eb9e379585"
     },
     {
       "path": "lib/ecf/xml.js",
@@ -130,8 +137,12 @@
       "sha256": "f0139c13e02c1b98154b0ac64f79b52528eed788ebf876e24aa83a2eafa89c7a"
     },
     {
+      "path": "migraciones/008_buzon.sql",
+      "sha256": "ed94257a961da956175deb438611219cc400161af6209b2026ab2bfc42b1b33b"
+    },
+    {
       "path": "package.json",
-      "sha256": "833fdf96e3cbe06b40f3d881017d25ab48fef9fd60ebc44e87cedbd9de26855e"
+      "sha256": "aac743da6f4d4feb3aef5cb34ea5fe42fcc73b4055434fca369aa5969f716a7e"
     },
     {
       "path": "public/acceso.js",
@@ -155,7 +166,7 @@
     },
     {
       "path": "public/ecf.js",
-      "sha256": "f2840bd1f6a0d4a2ae9ba5e46fefe060866a80f04c896952c6cc10c645e78bea"
+      "sha256": "b0672f5701351151c767cbc183596026da52d6a0d60a24ac39b1988873f8e9d1"
     },
     {
       "path": "public/favicon.svg",
@@ -163,11 +174,11 @@
     },
     {
       "path": "public/fiscal.js",
-      "sha256": "9793f07306c8102fc38e75c4638dba4bc95b641c4e9bdbd7110e791de82233d7"
+      "sha256": "0afd22e090ab2d88f8a2ee8ae9d0f9aea8343e74bb2a9bcf1a4429db59adb565"
     },
     {
       "path": "public/index.html",
-      "sha256": "7f38ddd4b64cc38a071dfc2e6db6e2d3791a998398e2537a89babdf4cfd73218"
+      "sha256": "4dafa2fff3b19f758d90d6b26a5e839caf8b7f3d5d95bb25ff6af0e60b9b37c6"
     },
     {
       "path": "public/productos.js",
@@ -199,7 +210,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "b5134716d0ee51c60733538ad3797e010136818968a4fc94b1feb27bba91cf60"
+      "sha256": "34638000ede06cd674e31f498ae4ab142ecbff608f9ee57f9242760bc4ba2f39"
     }
   ]
 }

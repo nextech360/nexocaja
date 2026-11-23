@@ -233,6 +233,7 @@
       ['TesteCF', 'CerteCF', 'eCF'].map(function (a) { return '<option value="' + a + '"' + (a === co.ambiente ? ' selected' : '') + '>' + AMB[a] + '</option>'; }).join('') +
       '</select><small>En pruebas y certificación los e-CF no tienen validez fiscal. Producción solo después de que la DGII te certifique.</small></div>' +
       '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px"><button type="button" class="nx-btn" data-test' + (cert ? '' : ' disabled') + '>Probar conexión con la DGII</button><span data-testres class="nx-muted" style="font-size:13px"></span></div>';
+    h += '<div data-buzon style="margin-top:14px"></div>';
     if (docs && docs.length) {
       h += '<h2 style="margin-top:14px">Últimos e-CF</h2><div class="nx-tablebox" style="min-height:0;max-height:260px"><table class="nx-table" style="min-width:0"><thead><tr><th>e-NCF</th><th class="r">Total</th><th>Estado</th><th></th></tr></thead><tbody>' +
         docs.map(function (d) {
@@ -242,7 +243,47 @@
     }
     return h + '</section>';
   }
+  // ── Buzón para recibir e-CF de suplidores ──
+  function paintBuzon(b, hasCert) {
+    var box = froot && froot.querySelector('[data-buzon]'); if (!box) return;
+    var h = '<h2>Buzón para recibir e-CF</h2>';
+    if (b.activo) {
+      h += '<p style="margin:0 0 6px" class="nx-diff-ok"><b>✔ Activo.</b> Tus suplidores ya pueden enviarte facturas electrónicas.</p>' +
+        '<p class="nx-muted" style="margin:0 0 6px;font-size:12px">Registra estas direcciones en el portal de certificación de la DGII (URL de recepción y de aprobación comercial):</p>' +
+        '<div class="nx-field"><label>URL de recepción</label><input class="num" readonly value="' + NX.esc(b.urls.recepcion) + '" onclick="this.select()"></div>' +
+        '<div class="nx-field"><label>URL de aprobación comercial</label><input class="num" readonly value="' + NX.esc(b.urls.aprobacion) + '" onclick="this.select()"></div>' +
+        '<p class="nx-muted" style="font-size:12px;margin:6px 0">Última revisión: ' + (b.lastSyncAt ? NX.esc(NX.date(b.lastSyncAt)) : '—') + (b.lastError ? ' · <span class="nx-diff-bad">' + NX.esc(b.lastError) + '</span>' : '') + '</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="nx-btn" data-bz-sync>Revisar ahora</button><button type="button" class="nx-btn nx-btn--danger" data-bz-off>Desactivar y borrar la copia del certificado</button></div>';
+    } else {
+      h += '<p class="nx-muted" style="margin:0 0 6px;font-size:13px">Para recibir facturas electrónicas de tus suplidores, la DGII exige un servicio en internet que responda al instante con un acuse firmado, aunque esta PC esté apagada. ' +
+        'Al activarlo, una <b>copia cifrada</b> de tu certificado se guarda en el Buzón NexoCaja (Vercel) y se usa <b>solo</b> para firmar esos acuses. Puedes desactivarlo cuando quieras y la copia se borra.</p>' +
+        '<form data-bz-form style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><div class="nx-field" style="flex:1 1 200px"><label for="bz-code">Código de activación</label><input id="bz-code" class="num" placeholder="NEXO-XXXXXX-XXXXXX" autocomplete="off"></div>' +
+        '<button type="submit" class="nx-btn nx-btn--primary" style="height:40px"' + (hasCert ? '' : ' disabled title="Sube primero el certificado"') + '>Activar Buzón</button></form>' +
+        '<div class="nx-error" data-bz-err hidden></div>';
+    }
+    box.innerHTML = h;
+    var f = box.querySelector('[data-bz-form]');
+    if (f) f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var err = box.querySelector('[data-bz-err]'); err.hidden = true;
+      var btn = f.querySelector('button'); btn.disabled = true; btn.textContent = 'Activando…';
+      NX.api('POST', '/api/ecf/buzon/activate', { code: box.querySelector('#bz-code').value }).then(function (r) { NX.toast('Buzón activado'); paintBuzon(r, true); })
+        .catch(function (x) { err.textContent = x.message; err.hidden = false; btn.disabled = false; btn.textContent = 'Activar Buzón'; });
+    });
+    var s = box.querySelector('[data-bz-sync]');
+    if (s) s.addEventListener('click', function () {
+      NX.api('POST', '/api/ecf/buzon/sync', {}).then(function (r) { NX.toast('Recibidas: ' + r.recibidos + ' · aprobaciones: ' + r.aprobaciones); paintBuzon(r.estado, true); })
+        .catch(function (x) { NX.toast(x.message, true); });
+    });
+    var o = box.querySelector('[data-bz-off]');
+    if (o) o.addEventListener('click', function () {
+      NX.confirm('Desactivar Buzón', 'Tus suplidores ya no podrán enviarte e-CF hasta que lo actives de nuevo. La copia del certificado se borra del Buzón.', 'Desactivar').then(function (ok) {
+        if (ok) NX.api('DELETE', '/api/ecf/buzon').then(function (r) { NX.toast('Buzón desactivado'); paintBuzon(r, true); }).catch(function (x) { NX.toast(x.message, true); });
+      });
+    });
+  }
   function wireEcf(co, cert) {
+    NX.api('GET', '/api/ecf/buzon').then(function (b) { paintBuzon(b, !!cert); }).catch(function () {});
     var f = froot.querySelector('[data-cert]');
     f.addEventListener('submit', function (e) {
       e.preventDefault();

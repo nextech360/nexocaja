@@ -54,6 +54,7 @@ const ecfRutas = await import('./lib/ecf/rutas.js');
 ecfEmision.initEcf(cfg);
 ecfCola.startQueue(dbMod.getDb());
 ecfEmision.onEcfIssued(ecfCola.kick);
+(await import('./lib/ecf/buzon.js')).startBuzonSync(dbMod.getDb());
 
 // ── Estado de trabajos ───────────────────────────────────────────
 // Cuando existan ventas/cobros, cada operación en curso hace busy++ / busy--.
