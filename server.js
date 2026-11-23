@@ -127,10 +127,12 @@ async function handle(req, res) {
   }
 
   if (pathname === '/api/info' && req.method === 'GET') {
-    const company = dbMod.getDb().prepare('SELECT legal_name, trade_name, rnc, branch, tax_regime, address, phone FROM company WHERE id = 1').get();
+    const company = dbMod.getDb().prepare('SELECT legal_name, trade_name, rnc, branch, tax_regime, address, phone, email FROM company WHERE id = 1').get();
+    const ancho = (dbMod.getDb().prepare("SELECT value FROM settings WHERE key = 'ticket_ancho'").get() || {}).value;
     return json(res, 200, {
       version: VERSION, company, caja: cfg.caja, dgiiAmbiente: cfg.dgii.ambiente, local: isLocal(req),
-      direccion: (company && company.address) || '', telefono: (company && company.phone) || '', fiscalMode: fiscal.fiscalMode(dbMod.getDb())
+      direccion: (company && company.address) || '', telefono: (company && company.phone) || '', email: (company && company.email) || '',
+      ticketAncho: ancho === '58' ? '58' : '80', fiscalMode: fiscal.fiscalMode(dbMod.getDb())
     });
   }
 

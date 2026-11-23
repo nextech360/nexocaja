@@ -164,68 +164,7 @@
     }).catch(function () { /* noop */ });
   };
 
-  // ── Bloques e-CF de la representación impresa ──────────────────
-  NX.ecfHeader = function (e) {
-    var row = function (a, b) { return '<div class="tk-row"><span>' + a + '</span><span>' + b + '</span></div>'; };
-    return (e.ambiente !== 'eCF' ? '<div class="tk-center tk-big">*** PRUEBA · SIN VALIDEZ FISCAL ***</div>' : '') +
-      '<div class="tk-center tk-big">' + NX.esc(e.tipoNombre) + '</div>' + row('e-NCF:', NX.esc(e.encf)) +
-      (e.venceSecuencia ? row('Vence secuencia:', NX.esc(e.venceSecuencia.split('-').reverse().join('-'))) : '') +
-      row('Fecha emisión:', NX.esc(e.fechaEmision)) + (e.referencia ? row('NCF modificado:', NX.esc(e.referencia)) : '');
-  };
-  NX.ecfFooter = function (e) {
-    var qr = '';
-    try { qr = NX.qrSvg ? NX.qrSvg(e.qrUrl, 132) : ''; } catch (x) { qr = ''; }
-    return '<hr class="tk-hr"><div class="tk-qr">' + qr + '</div>' +
-      '<div class="tk-row"><span>Código de seguridad:</span><span><b>' + NX.esc(e.codigoSeguridad) + '</b></span></div>' +
-      '<div class="tk-row"><span>Fecha de firma:</span><span>' + NX.esc(e.fechaFirma) + '</span></div>' +
-      (e.contingencia ? '<div class="tk-center">e-CF emitido en modalidad de Contingencia, el cual podrá ser consultado para su validez fiscal, a partir de las setenta y dos (72) horas.</div>' : '');
-  };
-
-  // ── Ticket 80 mm ───────────────────────────────────────────────
-  var METHOD_NAMES = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', transferencia: 'Transferencia', credito: 'Crédito' };
-  NX.printSale = function (sale) {
-    var c = (NX.info && NX.info.company) || {};
-    var when = NX.date(sale.paidAt || sale.createdAt);
-    var h = '';
-    if (sale.status === 'anulada') h += '<div class="tk-center tk-big">*** VENTA ANULADA ***</div>';
-    h += '<div class="tk-center tk-big">' + NX.esc(c.trade_name || 'NexoCaja') + '</div>';
-    if (c.legal_name && c.legal_name !== c.trade_name) h += '<div class="tk-center">' + NX.esc(c.legal_name) + '</div>';
-    if (c.rnc) h += '<div class="tk-center">RNC: ' + NX.esc(c.rnc) + '</div>';
-    if (NX.info && NX.info.direccion) h += '<div class="tk-center">' + NX.esc(NX.info.direccion) + '</div>';
-    if (NX.info && NX.info.telefono) h += '<div class="tk-center">Tel. ' + NX.esc(NX.info.telefono) + '</div>';
-    if (sale.ecf) {
-      h += '<hr class="tk-hr">' + NX.ecfHeader(sale.ecf);
-    } else if (sale.ncf) {
-      h += '<hr class="tk-hr"><div class="tk-center tk-big">' + NX.esc((NX.NCF_NAMES && NX.NCF_NAMES[sale.ncfType]) || 'Factura') + '</div>' +
-        '<div class="tk-row"><span>NCF:</span><span>' + NX.esc(sale.ncf) + '</span></div>' +
-        (sale.ncfExpiresOn ? '<div class="tk-row"><span>Válido hasta:</span><span>' + NX.esc(sale.ncfExpiresOn.split('-').reverse().join('/')) + '</span></div>' : '');
-    }
-    if (sale.customerName) h += '<div>Cliente: ' + NX.esc(sale.customerName) + '</div>' + (sale.customerDoc ? '<div>RNC/Céd.: ' + NX.esc(sale.customerDoc) + '</div>' : '');
-    h += '<hr class="tk-hr"><div class="tk-row"><span>Ticket ' + NX.esc(sale.folio) + '</span><span>' + NX.esc(NX.info ? NX.info.caja : '') + '</span></div>';
-    h += '<div>' + NX.esc(when) + '</div>' + (sale.cashier ? '<div>Le atendió: ' + NX.esc(sale.cashier) + '</div>' : '') + '<hr class="tk-hr">';
-    sale.lines.forEach(function (l) {
-      h += '<div class="tk-item"><div>' + NX.esc(l.name) + (l.taxRate === 0 ? ' (E)' : '') + '</div>' +
-        '<div class="tk-row"><span>' + NX.qty(l.qty) + ' x ' + NX.money(l.unitPrice) + (l.priceType === 'mayoreo' ? ' MAY' : '') + '</span><span>' + NX.money(l.lineTotal) + '</span></div>' +
-        (l.discount ? '<div class="tk-row"><span>  Desc. ' + NX.qty(l.discountPct) + '%</span><span>-' + NX.money(l.discount) + '</span></div>' : '') + '</div>';
-    });
-    h += '<hr class="tk-hr">';
-    var r = sale.byRate || {};
-    if (r[18] && (r[18].base || r[18].tax)) h += '<div class="tk-row"><span>Gravado 18%</span><span>' + NX.money(r[18].base) + '</span></div><div class="tk-row"><span>ITBIS 18%</span><span>' + NX.money(r[18].tax) + '</span></div>';
-    if (r[16] && (r[16].base || r[16].tax)) h += '<div class="tk-row"><span>Gravado 16%</span><span>' + NX.money(r[16].base) + '</span></div><div class="tk-row"><span>ITBIS 16%</span><span>' + NX.money(r[16].tax) + '</span></div>';
-    if (r[0] && r[0].base) h += '<div class="tk-row"><span>Exento</span><span>' + NX.money(r[0].base) + '</span></div>';
-    if (sale.discountTotal) h += '<div class="tk-row"><span>Descuentos</span><span>-' + NX.money(sale.discountTotal) + '</span></div>';
-    h += '<div class="tk-row tk-total"><span>TOTAL</span><span>' + NX.money(sale.total) + '</span></div><hr class="tk-hr">';
-    sale.payments.forEach(function (p) {
-      h += '<div class="tk-row"><span>' + (METHOD_NAMES[p.method] || p.method) + (p.reference ? ' (' + NX.esc(p.reference) + ')' : '') + '</span><span>' + NX.money(p.method === 'efectivo' && p.received ? p.received : p.amount) + '</span></div>';
-    });
-    if (sale.change) h += '<div class="tk-row"><span>Cambio</span><span>' + NX.money(sale.change) + '</span></div>';
-    h += '<hr class="tk-hr"><div class="tk-center">Gracias por su compra</div>';
-    if (sale.ecf) h += NX.ecfFooter(sale.ecf);
-    if (!sale.ncf) h += '<div class="tk-center">DOCUMENTO NO VÁLIDO COMO COMPROBANTE FISCAL</div>';
-    h += '<div class="tk-center" style="margin-top:4px">NexoCaja · NexTech360</div>';
-    $('print-area').innerHTML = h;
-    setTimeout(function () { window.print(); }, 50);
-  };
+  // El ticket (NX.printSale / NX.printCreditNote / NX.ticketHtml) vive en ticket.js
 
   // ── Actualizaciones ────────────────────────────────────────────
   var LATER_KEY = 'nexocaja-luego';

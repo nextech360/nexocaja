@@ -1,11 +1,11 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "date": "2026-11-23",
   "notes": [
-    "Buzon e-CF: recibe facturas electronicas de tus suplidores con acuse de recibo firmado, aunque la PC este apagada",
-    "Pantalla Comprobantes e-CF: pestaña Recibidos de suplidores con XML y acuse",
-    "Aprobacion comercial de tus clientes visible en cada factura",
-    "Activacion con codigo desde Configuracion fiscal; se puede desactivar y borrar la copia del certificado"
+    "Ticket rediseñado: datos completos del negocio, RNC, sucursal, correo y cajero",
+    "Bloque fiscal NCF / e-CF con tipo, numero, vencimiento, cliente y NCF modificado",
+    "Desglose por tasa, exento, descuentos, pago mixto, cambio y leyenda segun el tipo de comprobante",
+    "Papel de 58 mm o 80 mm y vista previa en pantalla"
   ],
   "files": [
     {
@@ -86,7 +86,7 @@
     },
     {
       "path": "lib/fiscal.js",
-      "sha256": "340b7cd2b55ca90746813dadfaf8a00fb25940ef482be4d4bb9e4c916371d290"
+      "sha256": "e12a9a54616e762afc75bd74d4ee35256848a7ba4de088189e4c7c86bc6850ee"
     },
     {
       "path": "lib/rd.js",
@@ -142,15 +142,15 @@
     },
     {
       "path": "package.json",
-      "sha256": "aac743da6f4d4feb3aef5cb34ea5fe42fcc73b4055434fca369aa5969f716a7e"
+      "sha256": "a7c89902fdcc88cfb8336812180c8887e6a4d188cb1aae7c5c1ec5f1e54fc935"
     },
     {
       "path": "public/acceso.js",
-      "sha256": "26e482040db95552d27cffc0fa319273daef2c37bdcecc8409d2c7445688617e"
+      "sha256": "4a982573298a639b40f9939dda82233ff8fd08e766c9520648eb0372c96b9544"
     },
     {
       "path": "public/app.js",
-      "sha256": "c7558130658a4077080b171e6910853a9b24663eb199940a80b678b67a819b38"
+      "sha256": "7a2b3d7454596c130631fe36c2053d84b87a6e6ae756e3476f29cde7cae13a52"
     },
     {
       "path": "public/caja.js",
@@ -162,7 +162,7 @@
     },
     {
       "path": "public/devoluciones.js",
-      "sha256": "29c51467fa86a4217242f4ea8da1b8c4fee68c68791b4a3c07e6f9cdfa47064d"
+      "sha256": "308162007cf07f3d1b688dfa1934383e31d5fca8a67c2df2a805d008ad674c5d"
     },
     {
       "path": "public/ecf.js",
@@ -174,11 +174,11 @@
     },
     {
       "path": "public/fiscal.js",
-      "sha256": "0afd22e090ab2d88f8a2ee8ae9d0f9aea8343e74bb2a9bcf1a4429db59adb565"
+      "sha256": "f2de0662cb93b0e3706641c3e76240276edbd772bc67f4d596139047e6985806"
     },
     {
       "path": "public/index.html",
-      "sha256": "4dafa2fff3b19f758d90d6b26a5e839caf8b7f3d5d95bb25ff6af0e60b9b37c6"
+      "sha256": "9d494cece9ca0ba127495ffcf0652462dc8c16d6ead4569523077d5800432dc7"
     },
     {
       "path": "public/productos.js",
@@ -194,7 +194,11 @@
     },
     {
       "path": "public/styles.css",
-      "sha256": "06110e135ed474f66dd274663e85bc216a5331edab73c97c4c4947d9f51a9d2b"
+      "sha256": "e325c8ce1e4d39100fc112e771264b474dbc84ff7ebd348c1c47d3160d90f02e"
+    },
+    {
+      "path": "public/ticket.js",
+      "sha256": "a12eb5413fbaafd440d6bf433be0c7358f63e5524da79c8d6aaee522de91e6a0"
     },
     {
       "path": "public/usuarios.js",
@@ -210,7 +214,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "34638000ede06cd674e31f498ae4ab142ecbff608f9ee57f9242760bc4ba2f39"
+      "sha256": "650983889f0d842a34f55d692d166ed51c5ec88ae5cecbb5cad67657d6463042"
     }
   ]
 }

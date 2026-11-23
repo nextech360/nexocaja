@@ -209,7 +209,7 @@
             '<td>' + NX.esc(NX.date(s.paidAt)) + '</td><td>' + NX.esc(s.cashier || '') + '</td>' +
             '<td>' + s.methods.map(function (x) { return METHOD[x] || x; }).join(' + ') + '</td><td class="r num">' + NX.money(s.total) + '</td>' +
             '<td class="c"><span class="nx-status ' + (cancelled ? 'nx-status--bad' : full || part ? 'nx-status--muted' : 'nx-status--ok') + '">' + (cancelled ? 'Anulada' : full ? 'Devuelta' : part ? 'Dev. parcial' : 'Pagada') + '</span></td>' +
-            '<td class="r" style="white-space:nowrap;text-decoration:none"><button type="button" class="nx-btn nx-btn--sm" data-print>Reimprimir</button> ' +
+            '<td class="r" style="white-space:nowrap;text-decoration:none"><button type="button" class="nx-btn nx-btn--sm" data-view>Ver</button> <button type="button" class="nx-btn nx-btn--sm" data-print>Reimprimir</button> ' +
             (cancelled || full ? '' : '<button type="button" class="nx-btn nx-btn--sm" data-return>Devolver</button> ') +
             (cancelled || s.returned || (s.ncf && s.ncf[0] === 'E') ? '' : '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-cancel data-ncf="' + NX.esc(s.ncf || '') + '">Anular</button>') + '</td></tr>';
         }).join('');
@@ -219,6 +219,7 @@
       var tr = e.target.closest('tr[data-id]'); if (!tr) return;
       var id = tr.getAttribute('data-id');
       if (e.target.closest('[data-print]')) NX.api('GET', '/api/sales/' + encodeURIComponent(id)).then(NX.printSale);
+      if (e.target.closest('[data-view]')) NX.api('GET', '/api/sales/' + encodeURIComponent(id)).then(function (sale) { NX.previewTicket(sale, false); });
       if (e.target.closest('[data-cancel]')) cancelSale(id, tr.children[0].textContent, e.target.closest('[data-cancel]').getAttribute('data-ncf'), load);
       if (e.target.closest('[data-return]')) NX.startReturn(tr.children[0].textContent, load).catch(function (x) { NX.toast(x.message, true); });
     });

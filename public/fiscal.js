@@ -340,6 +340,9 @@
       '<div class="nx-error full" data-err hidden></div><div class="full" style="display:flex;justify-content:flex-end"><button type="submit" class="nx-btn nx-btn--primary" style="height:40px">Guardar datos del emisor</button></div>' +
       '</form></section>' +
       ecfCard(co, cert, docs) +
+      '<section class="nx-card" data-tkcard><h2>Impresión del ticket</h2><p class="nx-muted" style="margin:0 0 8px;font-size:13px">El ticket toma los datos del emisor de arriba (nombre, razón social, RNC, sucursal, dirección, teléfono y correo). Lo que esté vacío no se imprime.</p>' +
+      '<div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap"><div class="nx-field"><label for="tk-w">Ancho del papel</label><select id="tk-w"><option value="80">80 mm (estándar)</option><option value="58">58 mm (pequeño)</option></select></div>' +
+      '<button type="button" class="nx-btn" data-tkprev style="height:40px">Vista previa</button></div></section>' +
       '<section class="nx-card"><h2>Secuencias autorizadas</h2>' +
       (seqs.length ? '<div class="nx-tablebox" style="min-height:0"><table class="nx-table" style="min-width:0"><thead><tr><th>Tipo</th><th>Rango</th><th class="r">Quedan</th><th>Vence</th><th class="c">Estado</th><th></th></tr></thead><tbody>' +
         seqs.map(function (s) {
@@ -367,8 +370,8 @@
       }).then(function (saved) {
         NX.toast('Datos del emisor guardados');
         if (NX.info) {
-          NX.info.company = { legal_name: saved.legalName, trade_name: saved.tradeName, rnc: saved.rnc, branch: saved.branch, tax_regime: saved.taxRegime };
-          NX.info.direccion = saved.address; NX.info.telefono = saved.phone; NX.info.fiscalMode = saved.mode;
+          NX.info.company = { legal_name: saved.legalName, trade_name: saved.tradeName, rnc: saved.rnc, branch: saved.branch, tax_regime: saved.taxRegime, email: saved.email };
+          NX.info.direccion = saved.address; NX.info.telefono = saved.phone; NX.info.email = saved.email; NX.info.fiscalMode = saved.mode;
           NX.$('company-name').textContent = saved.tradeName;
         }
         loadFiscal();
@@ -376,6 +379,13 @@
     });
     froot.querySelector('[data-newseq]').addEventListener('click', function () { seqForm(loadFiscal, co.mode === 'NCF' ? 'NCF' : 'ECF', co.ambiente); });
     wireEcf(co, cert);
+    var tkw = froot.querySelector('#tk-w');
+    tkw.value = NX.ticketWidth();
+    tkw.addEventListener('change', function () {
+      NX.api('PUT', '/api/fiscal/ticket', { ancho: tkw.value }).then(function (r) { if (NX.info) NX.info.ticketAncho = r.ancho; NX.toast('Ticket de ' + r.ancho + ' mm'); })
+        .catch(function (x) { NX.toast(x.message, true); });
+    });
+    froot.querySelector('[data-tkprev]').addEventListener('click', function () { NX.previewTicket(NX.lastSale || NX.sampleSale(), false, tkw.value); });
     froot.querySelectorAll('[data-toggle]').forEach(function (b) {
       b.addEventListener('click', function () {
         var tr = b.closest('tr'); var s = seqs.find(function (x) { return x.id === tr.getAttribute('data-id'); });

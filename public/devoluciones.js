@@ -5,39 +5,6 @@
   var REFUND = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', transferencia: 'Transferencia' };
   var root = null;
 
-  // ── Nota de crédito 80 mm ──────────────────────────────────────
-  NX.printCreditNote = function (n) {
-    var c = (NX.info && NX.info.company) || {};
-    var row = function (a, b) { return '<div class="tk-row"><span>' + a + '</span><span>' + b + '</span></div>'; };
-    var h = '<div class="tk-center tk-big">' + NX.esc(c.trade_name || 'NexoCaja') + '</div>';
-    if (c.legal_name && c.legal_name !== c.trade_name) h += '<div class="tk-center">' + NX.esc(c.legal_name) + '</div>';
-    if (c.rnc) h += '<div class="tk-center">RNC: ' + NX.esc(c.rnc) + '</div>';
-    if (NX.info && NX.info.direccion) h += '<div class="tk-center">' + NX.esc(NX.info.direccion) + '</div>';
-    if (n.ecf) h += '<hr class="tk-hr">' + NX.ecfHeader(n.ecf);
-    else h += '<hr class="tk-hr"><div class="tk-center tk-big">' + (n.ncf ? 'NOTA DE CRÉDITO' : 'DEVOLUCIÓN') + '</div>';
-    if (n.ncf && !n.ecf) {
-      h += row('NCF:', NX.esc(n.ncf)) + (n.ncfExpiresOn ? row('Válido hasta:', NX.esc(n.ncfExpiresOn.split('-').reverse().join('/'))) : '');
-      if (n.ncfModified) h += row('NCF modificado:', NX.esc(n.ncfModified));
-    }
-    h += row('Documento:', NX.esc(n.folio)) + row('Ticket original:', NX.esc(n.saleFolio || ''));
-    if (n.customerName) h += '<div>Cliente: ' + NX.esc(n.customerName) + '</div>' + (n.customerDoc ? '<div>RNC/Céd.: ' + NX.esc(n.customerDoc) + '</div>' : '');
-    h += '<div>' + NX.esc(NX.date(n.createdAt)) + '</div><div>Le atendió: ' + NX.esc(n.user || '') + '</div>' +
-      (n.authorizedBy ? '<div>Autorizó: ' + NX.esc(n.authorizedBy) + '</div>' : '') + '<hr class="tk-hr">';
-    n.lines.forEach(function (l) {
-      h += '<div class="tk-item"><div>' + NX.esc(l.name) + '</div>' + row(NX.qty(l.qty) + ' x ' + NX.money(l.unitPrice), NX.money(l.lineTotal)) + '</div>';
-    });
-    h += '<hr class="tk-hr">' + row('Monto sin ITBIS', NX.money(n.subtotal)) + row('ITBIS', NX.money(n.taxTotal)) +
-      '<div class="tk-row tk-total"><span>TOTAL DEVUELTO</span><span>' + NX.money(n.total) + '</span></div>' +
-      row('Devuelto en', REFUND[n.refundMethod] || n.refundMethod);
-    if (!n.itbisApplies) h += '<div style="margin-top:4px">Emitida después de 30 días de la factura: no rebaja el ITBIS.</div>';
-    h += '<div style="margin-top:4px">Motivo: ' + NX.esc(n.reason) + '</div>' + (n.ecf ? NX.ecfFooter(n.ecf) : '') + '<hr class="tk-hr">' +
-      '<div class="tk-center">Firma del cliente: ____________________</div>';
-    if (!n.ncf) h += '<div class="tk-center">DOCUMENTO NO VÁLIDO COMO COMPROBANTE FISCAL</div>';
-    h += '<div class="tk-center" style="margin-top:4px">NexoCaja · NexTech360</div>';
-    NX.$('print-area').innerHTML = h;
-    setTimeout(function () { window.print(); }, 50);
-  };
-
   // ── Diálogo de devolución ──────────────────────────────────────
   NX.openReturn = function (sale, after) {
     var lines = sale.lines.filter(function (l) { return l.qty - l.returnedQty > 1e-9; });
