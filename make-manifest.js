@@ -26,6 +26,14 @@ if (fs.existsSync(pkgPath)) {
   }
 }
 
+// Poner la versión en los enlaces de public/index.html (?v=X.Y.Z) para que el navegador no use archivos viejos
+const indexPath = path.join(ROOT, 'public', 'index.html');
+if (fs.existsSync(indexPath)) {
+  const html = fs.readFileSync(indexPath, 'utf8');
+  const updated = html.replace(/(\.(?:js|css|svg))\?v=[0-9.]+/g, `$1?v=${version}`);
+  if (updated !== html) fs.writeFileSync(indexPath, updated);
+}
+
 const files = [];
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {

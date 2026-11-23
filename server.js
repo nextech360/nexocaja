@@ -13,10 +13,11 @@ process.on('warning', (w) => {
   console.warn(w.message);
 });
 
-let dbMod, updater;
+let dbMod, updater, api;
 try {
   dbMod = await import('./lib/db.js');
   updater = await import('./lib/updater.js');
+  api = await import('./lib/api.js');
 } catch (err) {
   if (/sqlite/i.test(String(err.message))) {
     console.error('\n  Tu versión de Node.js es muy vieja para NexoCaja (necesita 22.13 o superior).');
@@ -66,6 +67,23 @@ function send(res, status, body, headers = {}) {
 }
 const json = (res, status, data) => send(res, status, JSON.stringify(data), { 'Content-Type': MIME['.json'], 'Cache-Control': 'no-store' });
 
+function readJson(req, limit = 1024 * 1024) {
+  return new Promise((resolve, reject) => {
+    let size = 0;
+    const chunks = [];
+    req.on('data', (c) => {
+      size += c.length;
+      if (size > limit) { reject(Object.assign(new Error('Solicitud demasiado grande'), { status: 413 })); req.destroy(); return; }
+      chunks.push(c);
+    });
+    req.on('end', () => {
+      try { resolve(chunks.length ? JSON.parse(Buffer.concat(chunks).toString('utf8')) : {}); }
+      catch { reject(Object.assign(new Error('JSON inválido'), { status: 400 })); }
+    });
+    req.on('error', reject);
+  });
+}
+
 function isLocal(req) {
   const ip = req.socket.remoteAddress || '';
   return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
@@ -80,7 +98,7 @@ function serveStatic(req, res, pathname) {
   fs.readFile(abs, (err, data) => {
     if (err) return send(res, 404, 'No encontrado', { 'Content-Type': 'text/plain; charset=utf-8' });
     const ext = path.extname(abs).toLowerCase();
-    send(res, 200, data, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': ext === '.html' ? 'no-cache' : 'max-age=300' });
+    send(res, 200, data, { 'Content-Type': MIME[ext] || 'application/octet-stream', 'Cache-Control': 'no-cache' }); // siempre revalidar: tras una actualización el navegador baja lo nuevo
   });
 }
 
@@ -99,7 +117,10 @@ async function handle(req, res) {
 
   if (pathname === '/api/info' && req.method === 'GET') {
     const company = dbMod.getDb().prepare('SELECT legal_name, trade_name, rnc, branch, tax_regime FROM company WHERE id = 1').get();
-    return json(res, 200, { version: VERSION, company, caja: cfg.caja, dgiiAmbiente: cfg.dgii.ambiente, local: isLocal(req) });
+    return json(res, 200, {
+      version: VERSION, company, caja: cfg.caja, dgiiAmbiente: cfg.dgii.ambiente, local: isLocal(req),
+      direccion: cfg.empresa.direccion || '', telefono: cfg.empresa.telefono || ''
+    });
   }
 
   if (pathname === '/api/update/check' && req.method === 'GET') {
@@ -114,6 +135,7 @@ async function handle(req, res) {
 
   if (pathname === '/api/update/apply' && req.method === 'POST') {
     if (!isLocal(req)) return json(res, 403, { error: 'Solo se puede actualizar desde la PC donde está instalado NexoCaja.' });
+    if (req.headers.origin && new URL(req.headers.origin).host !== req.headers.host) return json(res, 403, { error: 'Origen no permitido' });
     if (state.updating) return json(res, 409, { error: 'Ya se está actualizando.' });
     if (state.busy > 0) return json(res, 409, { error: 'Hay una venta en proceso. Espera a que termine para actualizar.' });
     state.updating = true;
@@ -152,7 +174,25 @@ async function handle(req, res) {
     return;
   }
 
-  if (pathname.startsWith('/api/')) return json(res, 404, { error: 'No encontrado' });
+  if (pathname.startsWith('/api/')) {
+    // Bloquea escrituras desde otras páginas web (solo se acepta JSON del propio NexoCaja)
+    if (req.method !== 'GET' && !String(req.headers['content-type'] || '').startsWith('application/json') && req.method !== 'DELETE') {
+      return json(res, 415, { error: 'Se esperaba JSON' });
+    }
+    const origin = req.headers.origin;
+    if (req.method !== 'GET' && origin && new URL(origin).host !== req.headers.host) {
+      return json(res, 403, { error: 'Origen no permitido' });
+    }
+    if (state.updating && req.method !== 'GET') return json(res, 503, { error: 'NexoCaja se está actualizando. Intenta en unos segundos.' });
+    try {
+      const handled = await api.handleApi(req, res, pathname, searchParams, { db: dbMod.getDb(), json, readJson, state, isLocal: isLocal(req) });
+      if (handled) return;
+    } catch (err) {
+      if (err.status) return json(res, err.status, { error: err.message });
+      throw err;
+    }
+    return json(res, 404, { error: 'No encontrado' });
+  }
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Método no permitido');
   return serveStatic(req, res, pathname);
 }

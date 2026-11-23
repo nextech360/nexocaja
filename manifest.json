@@ -1,8 +1,10 @@
 {
-  "version": "1.0.0",
-  "date": "2026-11-22",
+  "version": "1.1.0",
+  "date": "2026-11-23",
   "notes": [
-    "Primera version: base del sistema, base de datos por negocio y actualizacion con un boton"
+    "Pantalla de Caja: codigo de barras, F10 buscar, mayoreo, descuentos, tickets pendientes",
+    "Cobro con efectivo, tarjeta, transferencia o mixto y ticket de 80 mm",
+    "Productos e inventario con alertas de existencia baja"
   ],
   "files": [
     {
@@ -26,12 +28,16 @@
       "sha256": "ded4756545c8408fe94019ffc94f130a8811c522e735a2772e1d8d25dca9033d"
     },
     {
+      "path": "lib/api.js",
+      "sha256": "30cdfd615cc544b7bc630f71fe0f83f09ef9eaecf8576b63ba2be9fad1b723ee"
+    },
+    {
       "path": "lib/config.js",
       "sha256": "4d00cb9f2bbbd0ad9d3c9f22ccdb284c57a9d3d88116f90a3425818c53696514"
     },
     {
       "path": "lib/db.js",
-      "sha256": "25468b6f2f9205dc488dd13e3aaeb10e98160a3a61fcd82cc8e78a415788c3c4"
+      "sha256": "e4f45a4502848252a88293a36f7ae873328de67bb330ffb149ba330c45b2461d"
     },
     {
       "path": "lib/updater.js",
@@ -43,27 +49,43 @@
     },
     {
       "path": "make-manifest.js",
-      "sha256": "11ad96648ad02e3156318c5e1dcdf3d5ba8374d3118c6ef66dced0f6b52d7345"
+      "sha256": "1eecdddb68a281a912aab1796bf814106fbd46e888086739c5f76c2ec75aaefa"
     },
     {
       "path": "migraciones/001_init.sql",
       "sha256": "426d5d49e863dbcfa36bc322d95970f57b4c2d9073cd484c77feca844ad729e3"
     },
     {
+      "path": "migraciones/002_caja_productos.sql",
+      "sha256": "752b2a52639c27dbc784c44854351ffc1ce843e87ac36a175aa627659a17e3ee"
+    },
+    {
       "path": "package.json",
-      "sha256": "468c1d878612d31a66e25dda362e437e28c6b0511ad0336d59276b31bee38f3b"
+      "sha256": "ce33d3dafbc46946895c6267a27a83f383a54e20ce3c8a0311e3ec69aaa93b94"
     },
     {
       "path": "public/app.js",
-      "sha256": "1f410d964506f5b3ac47111079df25f58e161f293aaf7ade39b5ac07f0587d8a"
+      "sha256": "c1e800ea06bf24783e5f4f20d07f7ee9a242d7e5b7a70052b297ac3fbb97eca3"
+    },
+    {
+      "path": "public/caja.js",
+      "sha256": "a54b1d0d27f32c97cc9b5868d0ee871d434b3759a8304a968e7c5033a057e39a"
+    },
+    {
+      "path": "public/favicon.svg",
+      "sha256": "47257ee0ab3b64c769219b0e95df7f711edf893ce19c31d29a11e57ce2454dec"
     },
     {
       "path": "public/index.html",
-      "sha256": "85222d346ebcc0dedce0bf6c3aaaea9e9814f50021dcb0fea760feebd7e4755b"
+      "sha256": "cd6c494f38a46d4fe33d36c20a1d03e7b05feac73682a73f358db8593b10364a"
+    },
+    {
+      "path": "public/productos.js",
+      "sha256": "9244bc76162a618f4d2bd2b1c4a8023335c8d24487f84bf9173e30a5c2891e54"
     },
     {
       "path": "public/styles.css",
-      "sha256": "aea44a3fc0aa40f858eb56753875c6c881eb1bcd94a490f6cc39940cdd53d314"
+      "sha256": "1ef9d551f0a48d70d76f53b4b4bb44aa832343bb67c99a115c727b684af2311d"
     },
     {
       "path": "README.md",
@@ -75,7 +97,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "96227e5a5e8b7bce6455185a3bea5b64c0beb80b0d840fbf8ec88dea4e41c9af"
+      "sha256": "60b8daf87550f0a74754224ecade75dfcc6b6c9250a4c6f4b1b2bb640d968214"
     }
   ]
 }
