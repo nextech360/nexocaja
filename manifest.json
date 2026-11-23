@@ -99,7 +99,7 @@
     },
     {
       "path": "make-manifest.js",
-      "sha256": "1eecdddb68a281a912aab1796bf814106fbd46e888086739c5f76c2ec75aaefa"
+      "sha256": "c422932ff29e659cb6e4493cddde7e6d92d854beda04bb2507b08456cf358dad"
     },
     {
       "path": "migraciones/001_init.sql",
