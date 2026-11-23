@@ -1,28 +1,56 @@
 {
-  "version": "1.7.1",
+  "version": "1.7.2",
   "date": "2026-11-23",
   "notes": [
-    "Ticket rediseñado: datos completos del negocio, RNC, sucursal, correo y cajero",
-    "Bloque fiscal NCF / e-CF con tipo, numero, vencimiento, cliente y NCF modificado",
-    "Desglose por tasa, exento, descuentos, pago mixto, cambio y leyenda segun el tipo de comprobante",
-    "Papel de 58 mm o 80 mm y vista previa en pantalla"
+    "Instalacion independiente: archivo .env por equipo (puerto, carpeta de datos, caja)",
+    "Actualizador sin abrir la app: actualizar.bat / actualizar.sh",
+    "Scripts para Linux y macOS: instalar.sh e iniciar.sh",
+    "Guia INSTALACION.md"
   ],
   "files": [
+    {
+      "path": ".env.example",
+      "sha256": "170163ca70a7ac7d0842af79299eb2139279dd5217787e48cc729afabd281e03"
+    },
     {
       "path": ".gitattributes",
       "sha256": "9e8403192f50412cbf8a9b8719dbdc763d5566a4e16b05d0f3ebf8108caca4b9"
     },
     {
       "path": ".gitignore",
-      "sha256": "48dd199876ca55660494f2d4df50af92c2c4f242c4752f55a0020da4c84dad4c"
+      "sha256": "d8ba65719e8f24cb6d22342aa6775ea86ac4c65171e0fd5c0fdb03d87ae612f7"
+    },
+    {
+      "path": "actualizar.bat",
+      "sha256": "8de6a88a4aa8cad8785f6ecba2af235b4b47e1bc4562cb1e202c1f5b862f5a6d"
+    },
+    {
+      "path": "actualizar.mjs",
+      "sha256": "19098d4ba9e2bfc77c538815cb925d154e5d1b33e0656c5051b300bb6e3065ef"
+    },
+    {
+      "path": "actualizar.sh",
+      "sha256": "7e2be095a0750f6918012fc78d30428b6ad0a73f1c05518e37d7780909908a2d"
     },
     {
       "path": "iniciar.bat",
       "sha256": "62021b6a9c70789529289463341cf0cd64498a8ea02958c0bb81a97b55d5fa57"
     },
     {
+      "path": "iniciar.sh",
+      "sha256": "64d935ba36c0df281bf71760a6a40962255b9a6fc1313cbd36bd2a3330e8aa8a"
+    },
+    {
+      "path": "INSTALACION.md",
+      "sha256": "94ed3a10d70e5fd767ab03b470723c40702ffe376304de9a86bd954ed3a368e8"
+    },
+    {
       "path": "instalar.bat",
-      "sha256": "e450499117754c29159ab0a4c6f9604c2ae40c2b570e3e43cfac164f37e8ba78"
+      "sha256": "9677365185d374feae3111e2974ef4186e8166e8e7d1c59aae4b912d9ac72768"
+    },
+    {
+      "path": "instalar.sh",
+      "sha256": "fcb0d83459b01fab60807543c062f0ead4745d996f8c7cc2d825e2fd2ea45407"
     },
     {
       "path": "LEEME-PRIMERO.txt",
@@ -38,7 +66,7 @@
     },
     {
       "path": "lib/config.js",
-      "sha256": "4d00cb9f2bbbd0ad9d3c9f22ccdb284c57a9d3d88116f90a3425818c53696514"
+      "sha256": "18aa75f37cf3952f0e2faf0965f6c7ac3f22df9aead23c1414cde841d0b8f03c"
     },
     {
       "path": "lib/db.js",
@@ -98,7 +126,7 @@
     },
     {
       "path": "lib/updater.js",
-      "sha256": "02133a146193ba339fa727f71a83378befa3d7443e89b8d63951816f91f31da6"
+      "sha256": "651173ffc13be0e7f709c026b9ec2fb1e9d3858f8e5ca54a5d0e7a85a37aa5bc"
     },
     {
       "path": "LICENCIA.txt",
@@ -106,7 +134,7 @@
     },
     {
       "path": "make-manifest.js",
-      "sha256": "c422932ff29e659cb6e4493cddde7e6d92d854beda04bb2507b08456cf358dad"
+      "sha256": "21f32b470055305a96d41c93efb1dc085fb44b56a828cfd3b8dec39df5806f86"
     },
     {
       "path": "migraciones/001_init.sql",
@@ -142,7 +170,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "a7c89902fdcc88cfb8336812180c8887e6a4d188cb1aae7c5c1ec5f1e54fc935"
+      "sha256": "001517c0c65c9cf485231944fddfb745f29b691ff1d8af21237f200a0e4f2b7a"
     },
     {
       "path": "public/acceso.js",
@@ -178,7 +206,7 @@
     },
     {
       "path": "public/index.html",
-      "sha256": "9d494cece9ca0ba127495ffcf0652462dc8c16d6ead4569523077d5800432dc7"
+      "sha256": "c4c4275af099fb1a35a7b0ec7460de5322f811342ec5d3ee6635d20b710886d9"
     },
     {
       "path": "public/productos.js",

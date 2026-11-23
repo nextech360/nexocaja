@@ -38,6 +38,14 @@ if errorlevel 1 (
 
 set "PATH=%LOCALAPPDATA%\Microsoft\WinGet\Links;%ProgramFiles%\nodejs;%PATH%"
 
+rem ---- Ajustes propios de esta instalacion (.env) ----
+if not exist ".env" (
+  copy /y ".env.example" ".env" >nul
+  echo  Se creo el archivo .env de esta instalacion ^(puerto, carpeta de datos, caja^).
+) else (
+  echo  Ya existe .env ^(no se toca^).
+)
+
 echo.
 echo  ---- Revision final ----
 set "FALTA=0"

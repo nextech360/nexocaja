@@ -13,7 +13,7 @@ if (!/^\d+\.\d+\.\d+$/.test(version || '')) {
   process.exit(1);
 }
 
-const SKIP_NAMES = new Set(['config.json', 'config.json.bak', 'errores.log', 'manifest.json', 'node_modules', '.git', '_update_tmp', 'datos', 'respaldos', 'certs', '.DS_Store', 'Thumbs.db', 'desktop.ini', 'buzon']);
+const SKIP_NAMES = new Set(['config.json', 'config.json.bak', 'errores.log', 'manifest.json', 'node_modules', '.git', '_update_tmp', 'datos', 'respaldos', 'certs', '.DS_Store', 'Thumbs.db', 'desktop.ini', 'buzon', '.env', '.env.local']);
 const SKIP_EXT = ['.new', '.guardando', '.log', '.db', '.db-wal', '.db-shm', '.p12', '.pfx', '.pem', '.key'];
 
 // Mantener package.json con la misma versión (se escribe ANTES de calcular los hashes)

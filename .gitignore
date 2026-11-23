@@ -32,6 +32,8 @@ cookies*.txt
 historial*
 .env
 .env.*
+!.env.example
+*.enc
 
 # ── Sistema y editores ──
 .DS_Store
