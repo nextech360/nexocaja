@@ -69,6 +69,7 @@
       '<dt>Ventas en efectivo</dt><dd>' + NX.money(s.methods.efectivo) + '</dd>' +
       '<dt>Entradas de efectivo</dt><dd>' + NX.money(s.entradas) + '</dd>' +
       '<dt>Salidas de efectivo</dt><dd>−' + NX.money(s.salidas) + '</dd>' +
+      (s.refunds && s.refunds.efectivo ? '<dt>Devoluciones en efectivo</dt><dd>−' + NX.money(s.refunds.efectivo) + '</dd>' : '') +
       '<div class="sep"></div><dt class="strong">Efectivo esperado en caja</dt><dd class="strong">' + NX.money(s.expectedCash) + '</dd>';
     if (s.countedCash != null) {
       h += '<dt>Efectivo contado</dt><dd>' + NX.money(s.countedCash) + '</dd>' +
@@ -81,7 +82,8 @@
       '<dt>· Transferencia</dt><dd>' + NX.money(s.methods.transferencia) + '</dd>' +
       '<dt>ITBIS cobrado</dt><dd>' + NX.money(s.taxTotal) + '</dd>' +
       '<dt>Descuentos dados</dt><dd>' + NX.money(s.discountTotal) + '</dd>' +
-      '<dt>Ventas anuladas (' + s.cancelledCount + ')</dt><dd>' + NX.money(s.cancelledTotal) + '</dd>';
+      '<dt>Ventas anuladas (' + s.cancelledCount + ')</dt><dd>' + NX.money(s.cancelledTotal) + '</dd>' +
+      (s.refunds && s.refunds.count ? '<dt>Devoluciones (' + s.refunds.count + ')</dt><dd>−' + NX.money(s.refunds.total) + '</dd>' : '');
     if (s.profit != null) h += '<div class="sep"></div><dt class="strong">Ganancia estimada</dt><dd class="strong">' + NX.money(s.profit) + '</dd>';
     return h + '</dl>';
   }
@@ -95,11 +97,13 @@
       (s.closedAt ? row('Cerró', NX.esc(s.closedBy || '')) + row('Cierre', NX.esc(NX.date(s.closedAt))) : row('Impreso', NX.esc(new Date().toLocaleString('es-DO')))) +
       '<hr class="tk-hr">' + row('Fondo inicial', NX.money(s.openingFloat)) + row('Ventas efectivo', NX.money(s.methods.efectivo)) +
       row('Entradas', NX.money(s.entradas)) + row('Salidas', '-' + NX.money(s.salidas)) +
+      (s.refunds && s.refunds.efectivo ? row('Devoluciones', '-' + NX.money(s.refunds.efectivo)) : '') +
       '<div class="tk-row tk-total"><span>ESPERADO</span><span>' + NX.money(s.expectedCash) + '</span></div>';
     if (s.countedCash != null) h += row('Contado', NX.money(s.countedCash)) + row('Diferencia', (s.difference < 0 ? '-' : '') + NX.money(Math.abs(s.difference)));
     h += '<hr class="tk-hr">' + row('Ventas (' + s.salesCount + ')', NX.money(s.salesTotal)) + row(' Efectivo', NX.money(s.methods.efectivo)) +
       row(' Tarjeta', NX.money(s.methods.tarjeta)) + row(' Transferencia', NX.money(s.methods.transferencia)) +
-      row('ITBIS', NX.money(s.taxTotal)) + row('Descuentos', NX.money(s.discountTotal)) + row('Anuladas (' + s.cancelledCount + ')', NX.money(s.cancelledTotal));
+      row('ITBIS', NX.money(s.taxTotal)) + row('Descuentos', NX.money(s.discountTotal)) + row('Anuladas (' + s.cancelledCount + ')', NX.money(s.cancelledTotal)) +
+      (s.refunds && s.refunds.count ? row('Devoluc. (' + s.refunds.count + ')', '-' + NX.money(s.refunds.total)) : '');
     if (s.byCashier && s.byCashier.length) {
       h += '<hr class="tk-hr"><div>Por cajero:</div>' + s.byCashier.map(function (x) { return row(' ' + NX.esc(x.name || '') + ' (' + x.n + ')', NX.money(x.total)); }).join('');
     }

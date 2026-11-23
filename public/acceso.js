@@ -194,7 +194,7 @@
   var METHOD = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', transferencia: 'Transf.', credito: 'Crédito' };
   NX.openSalesDay = function () {
     var m = NX.modal({
-      title: 'Ventas del día y anulaciones', wide: true,
+      title: 'Ventas del día, anulaciones y devoluciones', wide: true,
       html: '<div class="nx-modal-body"><div class="nx-tablebox" style="max-height:460px;min-height:120px"><table class="nx-table" style="min-width:640px"><thead><tr>' +
         '<th>Ticket</th><th>NCF</th><th>Hora</th><th>Cajero</th><th>Pago</th><th class="r">Total</th><th class="c">Estado</th><th><span style="position:absolute;left:-9999px">Acciones</span></th>' +
         '</tr></thead><tbody></tbody></table><div class="nx-empty" data-none hidden>Todavía no hay ventas hoy.</div></div></div>'
@@ -204,12 +204,14 @@
         m.el.querySelector('[data-none]').hidden = rows.length > 0;
         m.el.querySelector('tbody').innerHTML = rows.map(function (s) {
           var cancelled = s.status === 'anulada';
+          var full = s.returned >= s.total, part = s.returned > 0 && !full;
           return '<tr data-id="' + NX.esc(s.id) + '" class="' + (cancelled ? 'is-cancelled' : '') + '"><td class="num">' + NX.esc(s.folio) + '</td><td class="num">' + NX.esc(s.ncf || '—') + (s.customer ? '<br><small class="nx-muted">' + NX.esc(s.customer) + '</small>' : '') + '</td>' +
             '<td>' + NX.esc(NX.date(s.paidAt)) + '</td><td>' + NX.esc(s.cashier || '') + '</td>' +
             '<td>' + s.methods.map(function (x) { return METHOD[x] || x; }).join(' + ') + '</td><td class="r num">' + NX.money(s.total) + '</td>' +
-            '<td class="c"><span class="nx-status ' + (cancelled ? 'nx-status--bad' : 'nx-status--ok') + '">' + (cancelled ? 'Anulada' : 'Pagada') + '</span></td>' +
+            '<td class="c"><span class="nx-status ' + (cancelled ? 'nx-status--bad' : full || part ? 'nx-status--muted' : 'nx-status--ok') + '">' + (cancelled ? 'Anulada' : full ? 'Devuelta' : part ? 'Dev. parcial' : 'Pagada') + '</span></td>' +
             '<td class="r" style="white-space:nowrap;text-decoration:none"><button type="button" class="nx-btn nx-btn--sm" data-print>Reimprimir</button> ' +
-            (cancelled ? '' : '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-cancel>Anular</button>') + '</td></tr>';
+            (cancelled || full ? '' : '<button type="button" class="nx-btn nx-btn--sm" data-return>Devolver</button> ') +
+            (cancelled || s.returned ? '' : '<button type="button" class="nx-btn nx-btn--sm nx-btn--danger" data-cancel data-ncf="' + NX.esc(s.ncf || '') + '">Anular</button>') + '</td></tr>';
         }).join('');
       }).catch(function (x) { NX.toast(x.message, true); });
     }
@@ -217,15 +219,20 @@
       var tr = e.target.closest('tr[data-id]'); if (!tr) return;
       var id = tr.getAttribute('data-id');
       if (e.target.closest('[data-print]')) NX.api('GET', '/api/sales/' + encodeURIComponent(id)).then(NX.printSale);
-      if (e.target.closest('[data-cancel]')) cancelSale(id, tr.children[0].textContent, load);
+      if (e.target.closest('[data-cancel]')) cancelSale(id, tr.children[0].textContent, e.target.closest('[data-cancel]').getAttribute('data-ncf'), load);
+      if (e.target.closest('[data-return]')) NX.startReturn(tr.children[0].textContent, load).catch(function (x) { NX.toast(x.message, true); });
     });
     load();
   };
 
-  function cancelSale(id, folio, after) {
+  var CANCEL_TYPES = [['01', 'Deterioro de factura pre-impresa'], ['02', 'Errores de impresión (factura pre-impresa)'], ['03', 'Impresión defectuosa'], ['04', 'Corrección de la información'],
+    ['05', 'Cambio de productos'], ['06', 'Devolución de productos'], ['07', 'Omisión de productos'], ['08', 'Errores en secuencias de NCF'], ['09', 'Por cese de operaciones'], ['10', 'Pérdida o hurto de talonarios']];
+  function cancelSale(id, folio, ncf, after) {
     var m = NX.modal({
       title: 'Anular venta ' + folio,
       html: '<div class="nx-modal-body"><p style="margin:0">La venta queda anulada, sale del corte y los productos vuelven al inventario.</p>' +
+        (ncf ? '<p style="margin:0">El NCF <b class="num">' + NX.esc(ncf) + '</b> queda anulado y se reporta en el formato 608. Si el cliente ya se llevó la factura, usa <b>Devolver</b> (nota de crédito) en vez de anular.</p>' +
+          '<div class="nx-field"><label for="an-type">Tipo de anulación (608)</label><select id="an-type"><option value="">Elige…</option>' + CANCEL_TYPES.map(function (t) { return '<option value="' + t[0] + '">' + t[0] + ' — ' + t[1] + '</option>'; }).join('') + '</select></div>' : '') +
         '<div class="nx-field"><label for="an-reason">Motivo</label><input id="an-reason" maxlength="200" placeholder="Ej. el cliente devolvió todo" autofocus></div>' +
         '<div class="nx-error" data-err hidden></div></div>' +
         '<div class="nx-modal-foot"><button type="button" class="nx-btn" data-x>Esc — Cancelar</button><button type="button" class="nx-btn nx-btn--primary" data-ok>Enter — Anular venta</button></div>',
@@ -234,9 +241,11 @@
     function ok(close) {
       var reason = m.el.querySelector('#an-reason').value.trim();
       var err = m.el.querySelector('[data-err]');
+      var type = ncf ? m.el.querySelector('#an-type').value : undefined;
+      if (ncf && !type) { err.textContent = 'Elige el tipo de anulación.'; err.hidden = false; return; }
       if (!reason) { err.textContent = 'Escribe el motivo.'; err.hidden = false; return; }
       NX.askSupervisorPin('ventas.anular', 'Anular una venta').then(function (pin) {
-        return NX.api('POST', '/api/sales/' + encodeURIComponent(id) + '/cancel', { reason: reason, authPin: pin || undefined });
+        return NX.api('POST', '/api/sales/' + encodeURIComponent(id) + '/cancel', { reason: reason, cancelType: type, authPin: pin || undefined });
       }).then(function () {
         close(); NX.toast('Venta ' + folio + ' anulada'); NX.refreshFooter(); after();
       }).catch(function (x) { if (x.message !== 'cancelado') { err.textContent = x.message; err.hidden = false; } });

@@ -26,7 +26,7 @@
       return { ok: false, text: 'RNC: 9 dígitos · Cédula: 11 dígitos (' + n.length + ' escritos)' };
     }
   };
-  NX.NCF_NAMES = { '02': 'Factura de Consumo', '01': 'Factura de Crédito Fiscal', '15': 'Factura Gubernamental' };
+  NX.NCF_NAMES = { '02': 'Factura de Consumo', '01': 'Factura de Crédito Fiscal', '15': 'Factura Gubernamental', '04': 'Nota de Crédito' };
 
   NX.fiscal = { status: null };
   NX.loadFiscalStatus = function () {
@@ -163,7 +163,7 @@
     var m = NX.modal({
       title: 'Registrar secuencia NCF autorizada',
       html: '<div class="nx-modal-body"><p style="margin:0">Copia los datos tal como aparecen en la autorización de la DGII (Oficina Virtual → Solicitud de comprobantes).</p><div class="nx-form">' +
-        '<div class="nx-field full"><label for="sq-type">Tipo de comprobante</label><select id="sq-type"><option value="02">B02 — Factura de Consumo</option><option value="01">B01 — Factura de Crédito Fiscal</option><option value="15">B15 — Gubernamental</option></select></div>' +
+        '<div class="nx-field full"><label for="sq-type">Tipo de comprobante</label><select id="sq-type"><option value="02">B02 — Factura de Consumo</option><option value="01">B01 — Factura de Crédito Fiscal</option><option value="15">B15 — Gubernamental</option><option value="04">B04 — Nota de Crédito (devoluciones)</option></select></div>' +
         '<div class="nx-field"><label for="sq-start">Desde (número de secuencia)</label><input id="sq-start" class="num" inputmode="numeric" value="1"><small data-from></small></div>' +
         '<div class="nx-field"><label for="sq-end">Hasta</label><input id="sq-end" class="num" inputmode="numeric" placeholder="Ej. 500"><small data-to></small></div>' +
         '<div class="nx-field"><label for="sq-exp">Fecha de vencimiento</label><input id="sq-exp" type="date" value="' + nextYear + '-12-31"></div>' +

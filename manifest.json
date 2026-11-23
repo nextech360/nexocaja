@@ -1,11 +1,12 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "date": "2026-11-23",
   "notes": [
-    "Configuracion fiscal: datos del emisor y comprobantes NCF (serie B)",
-    "Secuencias NCF con vencimiento, alertas y bloqueo al agotarse o vencer",
-    "Factura de Consumo, Credito Fiscal y Gubernamental desde la caja (F2 cliente)",
-    "Clientes con validacion de RNC y cedula"
+    "Devoluciones con Nota de Credito B04 (parcial o total), con autorizacion de supervisor",
+    "Regla de 30 dias: despues de ese plazo la nota se emite sin ITBIS",
+    "Reportes DGII: formato 607 (ventas) y 608 (NCF anulados) en TXT listo para pre-validar",
+    "Al anular una venta con NCF se elige el tipo de anulacion del 608",
+    "El corte de caja descuenta las devoluciones en efectivo"
   ],
   "files": [
     {
@@ -30,11 +31,11 @@
     },
     {
       "path": "lib/api.js",
-      "sha256": "f05fb5d8cd8851461665eafb81e0fbd11bde5db3f93e18df58998da819aa1d60"
+      "sha256": "74df78addda176e5e8b060ccdae17de3755c43c627ee82db9127ba6133152993"
     },
     {
       "path": "lib/auth.js",
-      "sha256": "e2c0275bc82826bc452aef0e46af9af0835899bdc1a9359b5998e40b280f9914"
+      "sha256": "db6090d8aae0a7ffd180ad4a022db2b05c516a6da61ea00a8d691edccaae8c20"
     },
     {
       "path": "lib/config.js",
@@ -45,12 +46,20 @@
       "sha256": "ac6bb14f58c1b47559062647b8262952bb3e8d39d410c203923ac3ca0d8454f4"
     },
     {
+      "path": "lib/devoluciones.js",
+      "sha256": "634971ab86db31f1027536621124426cb350824b3a8814fb540ee567601ffeb7"
+    },
+    {
       "path": "lib/fiscal.js",
-      "sha256": "f4195a338dbae058709b8a59787a1c646608c328bec1b56b7fa7b871bf7bdcf7"
+      "sha256": "757ab8537341037a3cb7b92f15d500e87158ddd794ebf083572b95348d67514b"
     },
     {
       "path": "lib/rd.js",
-      "sha256": "3695537f4a86ac972be4bbf24c022d63fd0085c1bcc58a996da0b5dc7d3cb631"
+      "sha256": "dbe25f8f208e0b9f112335c6f9bc5063cf08707959ab30f10c610d878b2afc96"
+    },
+    {
+      "path": "lib/reportes.js",
+      "sha256": "6aa99963595ccc971ba54636c16c77f2643422c7dbd7853ba85b21563650acba"
     },
     {
       "path": "lib/updater.js",
@@ -81,12 +90,16 @@
       "sha256": "9b10d8e7e79c9320aa644451f7487db0081e7d8b4f4a90b159adc785adddbb08"
     },
     {
+      "path": "migraciones/005_notas_credito.sql",
+      "sha256": "90fda9189c4dd7626331edc05bf6dd7ca2b9e0b65342e847e2adc3fc1f9ce711"
+    },
+    {
       "path": "package.json",
-      "sha256": "561470967cf3562a836d46462551ae8d30ae70767f3c9684d8d55def4a8997de"
+      "sha256": "89a2671cc471938940fe61250a0a46ca8f2afe2ec18700e174149d39b017c2f5"
     },
     {
       "path": "public/acceso.js",
-      "sha256": "27b33b9b1a9d68ff0003739d508b0f375e31d6638a7dd83ccea7a51c60967a82"
+      "sha256": "0d686deeab8b1c56fac89d7208f6ee78f031cd5d79768f09458ec2a54428c7b4"
     },
     {
       "path": "public/app.js",
@@ -98,7 +111,11 @@
     },
     {
       "path": "public/corte.js",
-      "sha256": "c03240508040699d5ce315d1668cdf3fc4e4f883f073bdcabffce2bcc2398a35"
+      "sha256": "a6a9e05e293df275655fb387022dd16ebbab6c076e7f8f130d9e3a68bd3bd62d"
+    },
+    {
+      "path": "public/devoluciones.js",
+      "sha256": "8a8d3d53f561507e8cfff4d1a6c3d1e9aab4b1ae3ea4bf6807d0dc437d8add78"
     },
     {
       "path": "public/favicon.svg",
@@ -106,19 +123,23 @@
     },
     {
       "path": "public/fiscal.js",
-      "sha256": "15409c38340067dd77822635802b94e60a40d45f9bac726f60722aec9093665f"
+      "sha256": "fcdf64f828f4e029df8fe93e03e27abf6713cfc13647317926a51fbe8398bbea"
     },
     {
       "path": "public/index.html",
-      "sha256": "c5dabde23f8ca956ff61d24b885d7a61136da63bc977ef46ea29141e0a8346db"
+      "sha256": "102d6acfa0150d6b2ffc7ff3d6fdae438262cb7270e4d1c1129f38fc8e8c726a"
     },
     {
       "path": "public/productos.js",
       "sha256": "55f5a185305628976c600635f10090ba84b8c3fc5a1fe7fd45ecbfcd3c1c867e"
     },
     {
+      "path": "public/reportes.js",
+      "sha256": "1597a232e4af958e1bab6049ae5e247f5987a7a4e2d33e65a9eecb5418a978e5"
+    },
+    {
       "path": "public/styles.css",
-      "sha256": "7ced91ee3d477257a39238f3e62e16c8691a5c60c9580f4ee417ef986636559d"
+      "sha256": "696466f130cdaa0eee0f8c6c0d99cf8c328141a71a8502c42b323c47f850fb6a"
     },
     {
       "path": "public/usuarios.js",
@@ -134,7 +155,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "2c698f8916ccb93e7b2273180ddb2e10f058f69d17ec345a18d45484efad6973"
+      "sha256": "23e6ba26b5a7c57fbb55c6a4f80ec0564bd1458bd384d6f55d232f4fc9d3d041"
     }
   ]
 }

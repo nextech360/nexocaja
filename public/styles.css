@@ -254,3 +254,6 @@ input, select { font: inherit; color: inherit; }
 .nx-fb-label { color: var(--nx-primary-dark); font-weight: 700; }
 .nx-fb-types { display: flex; flex-wrap: wrap; gap: 4px; }
 .nx-fb-alerts { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ── Devoluciones (1.4.0) ───────────────────────── */
+.nx-table tr.is-bad input { border-color: #dc2626; background: #fef2f2; }

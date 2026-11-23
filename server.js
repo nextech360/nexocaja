@@ -13,13 +13,15 @@ process.on('warning', (w) => {
   console.warn(w.message);
 });
 
-let dbMod, updater, api, auth, fiscal;
+let dbMod, updater, api, auth, fiscal, returns, reports;
 try {
   dbMod = await import('./lib/db.js');
   updater = await import('./lib/updater.js');
   api = await import('./lib/api.js');
   auth = await import('./lib/auth.js');
   fiscal = await import('./lib/fiscal.js');
+  returns = await import('./lib/devoluciones.js');
+  reports = await import('./lib/reportes.js');
 } catch (err) {
   if (/sqlite/i.test(String(err.message))) {
     console.error('\n  Tu versión de Node.js es muy vieja para NexoCaja (necesita 22.13 o superior).');
@@ -200,6 +202,8 @@ async function handle(req, res) {
       }
       ctx.user = auth.currentUser(db, req);
       if ((await fiscal.handleFiscal(req, res, pathname, searchParams, ctx)) !== false) return;
+      if ((await returns.handleReturns(req, res, pathname, searchParams, ctx)) !== false) return;
+      if ((await reports.handleReports(req, res, pathname, searchParams, ctx)) !== false) return;
       const handled = await api.handleApi(req, res, pathname, searchParams, ctx);
       if (handled) return;
     } catch (err) {
