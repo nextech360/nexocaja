@@ -196,7 +196,7 @@
     var m = NX.modal({
       title: 'Ventas del día y anulaciones', wide: true,
       html: '<div class="nx-modal-body"><div class="nx-tablebox" style="max-height:460px;min-height:120px"><table class="nx-table" style="min-width:640px"><thead><tr>' +
-        '<th>Ticket</th><th>Hora</th><th>Cajero</th><th>Pago</th><th class="r">Total</th><th class="c">Estado</th><th><span style="position:absolute;left:-9999px">Acciones</span></th>' +
+        '<th>Ticket</th><th>NCF</th><th>Hora</th><th>Cajero</th><th>Pago</th><th class="r">Total</th><th class="c">Estado</th><th><span style="position:absolute;left:-9999px">Acciones</span></th>' +
         '</tr></thead><tbody></tbody></table><div class="nx-empty" data-none hidden>Todavía no hay ventas hoy.</div></div></div>'
     });
     function load() {
@@ -204,7 +204,7 @@
         m.el.querySelector('[data-none]').hidden = rows.length > 0;
         m.el.querySelector('tbody').innerHTML = rows.map(function (s) {
           var cancelled = s.status === 'anulada';
-          return '<tr data-id="' + NX.esc(s.id) + '" class="' + (cancelled ? 'is-cancelled' : '') + '"><td class="num">' + NX.esc(s.folio) + '</td>' +
+          return '<tr data-id="' + NX.esc(s.id) + '" class="' + (cancelled ? 'is-cancelled' : '') + '"><td class="num">' + NX.esc(s.folio) + '</td><td class="num">' + NX.esc(s.ncf || '—') + (s.customer ? '<br><small class="nx-muted">' + NX.esc(s.customer) + '</small>' : '') + '</td>' +
             '<td>' + NX.esc(NX.date(s.paidAt)) + '</td><td>' + NX.esc(s.cashier || '') + '</td>' +
             '<td>' + s.methods.map(function (x) { return METHOD[x] || x; }).join(' + ') + '</td><td class="r num">' + NX.money(s.total) + '</td>' +
             '<td class="c"><span class="nx-status ' + (cancelled ? 'nx-status--bad' : 'nx-status--ok') + '">' + (cancelled ? 'Anulada' : 'Pagada') + '</span></td>' +

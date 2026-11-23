@@ -60,6 +60,7 @@
     }).join('');
 
     root.querySelector('[data-band-title]').textContent = 'VENTA — Ticket ' + t.id;
+    paintFiscal(t);
     root.querySelector('[data-wholesale-chip]').hidden = !t.wholesale;
     root.querySelector('[data-mayoreo]').setAttribute('aria-pressed', String(!!t.wholesale));
     root.querySelector('[data-tabs]').innerHTML = tabs + '<button type="button" class="nx-tab nx-tab--new" data-newtab>+ Nuevo ticket</button>';
@@ -74,6 +75,49 @@
     var sel = root.querySelector('tr.is-sel');
     if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest' });
     save();
+  }
+
+  function fiscalOn() { var st0 = NX.fiscal.status; return !!(st0 && st0.mode === 'NCF'); }
+  function paintFiscal(t) {
+    var stt = NX.fiscal.status;
+    var chip = root.querySelector('[data-doc-chip]');
+    var bar = root.querySelector('[data-fiscal]');
+    var cust = t.customer
+      ? '<b>' + NX.esc(t.customer.name) + '</b>' + (t.customer.docFormatted ? ' <span class="nx-num">· ' + (t.customer.docType === 'RNC' ? 'RNC ' : 'Céd. ') + NX.esc(t.customer.docFormatted) + '</span>' : '')
+      : '<b>Consumidor final</b>';
+    var html = '<span class="nx-fb-label">Cliente:</span> ' + cust +
+      ' <button type="button" class="nx-btn nx-btn--sm" data-cust><kbd class="nx-key">F2</kbd>' + (t.customer ? 'Cambiar' : 'Elegir cliente') + '</button>' +
+      (t.customer ? ' <button type="button" class="nx-btn nx-btn--sm" data-nocust>Quitar</button>' : '');
+    if (fiscalOn()) {
+      var type = t.ncfType || '02';
+      html += '<span class="nx-spacer"></span><span class="nx-fb-label">Comprobante:</span><span role="group" aria-label="Tipo de comprobante" class="nx-fb-types">' +
+        stt.types.map(function (ty) {
+          return '<button type="button" class="nx-btn nx-btn--sm" data-ncf="' + ty.code + '" aria-pressed="' + (ty.code === type) + '"' + (ty.available ? '' : ' disabled title="Sin secuencia disponible"') + '>' +
+            NX.esc(ty.name) + ' <span class="nx-num" style="font-size:11px">B' + ty.code + (ty.available ? ' · ' + ty.remaining : ' · 0') + '</span></button>';
+        }).join('') + '</span>';
+      var cur = stt.types.find(function (x) { return x.code === type; }) || {};
+      chip.textContent = (NX.NCF_NAMES[type] || '') + (cur.nextNcf ? ' · próximo NCF ' + cur.nextNcf : ' · SIN NCF DISPONIBLE');
+      chip.className = 'nx-chip' + (cur.available ? '' : ' nx-chip--warn');
+    } else {
+      chip.textContent = 'Ticket de venta (sin comprobante fiscal)';
+      chip.className = 'nx-chip';
+    }
+    var alerts = stt && stt.alerts && stt.alerts.length ? '<div class="nx-fb-alerts">' + stt.alerts.map(function (a) { return '<span class="nx-pill ' + (a.level === 'bad' ? 'nx-pill--bad' : 'nx-pill--warn') + '">' + NX.esc(a.text) + '</span>'; }).join('') + '</div>' : '';
+    bar.innerHTML = '<div class="nx-fb-row">' + html + '</div>' + alerts;
+  }
+  function chooseCustomer() {
+    NX.pickCustomer(function (c) { ticket().customer = c || null; render(); focusCode(); });
+  }
+  function setNcfType(code) { ticket().ncfType = code; render(); focusCode(); }
+  /** Revisa en la caja lo que el servidor exigiría, para avisar antes de abrir el cobro. */
+  function fiscalProblem(t) {
+    if (!fiscalOn()) return '';
+    var type = t.ncfType || '02';
+    var ty = NX.fiscal.status.types.find(function (x) { return x.code === type; });
+    if (!ty || !ty.available) return 'No hay NCF de ' + (ty ? ty.name : 'ese tipo') + ' disponibles. El dueño debe registrar una secuencia en Configuración fiscal.';
+    if (ty.needsDoc && !(t.customer && t.customer.docNumber)) return 'La ' + NX.NCF_NAMES[type] + ' necesita un cliente con RNC o cédula.';
+    if (type === '15' && t.customer.docType !== 'RNC') return 'La factura Gubernamental necesita el RNC de la institución.';
+    return '';
   }
 
   function focusCode() { var i = root && root.querySelector('#codigo'); if (i) i.focus(); }
@@ -240,15 +284,25 @@
   function openCobro() {
     var t = ticket();
     if (!t.lines.length) return;
+    var problem = fiscalProblem(t);
+    if (problem) { NX.toast(problem, true); if (/cliente/.test(problem)) chooseCustomer(); return; }
     var payload = { lines: linesPayload(t), wholesale: !!t.wholesale };
-    NX.api('POST', '/api/sales/quote', payload).then(function (q) { showCobro(t, payload, q.total); })
+    if (fiscalOn()) payload.ncfType = t.ncfType || '02';
+    if (t.customer) payload.customerId = t.customer.id;
+    NX.api('POST', '/api/sales/quote', payload).then(function (q) {
+      if (fiscalOn() && payload.ncfType === '02' && q.total >= NX.fiscal.status.consumoThreshold && !(t.customer && t.customer.docNumber)) {
+        NX.toast('Las facturas de consumo de RD$250,000 o más deben identificar al comprador. Elige el cliente con F2.', true);
+        chooseCustomer(); return;
+      }
+      showCobro(t, payload, q.total);
+    })
       .catch(function (err) { NX.toast(err.message, true); });
   }
   function showCobro(t, payload, total) {
     var method = 'efectivo'; var busy = false;
     var printPref = NX.store.get('nexocaja-imprimir', true);
     var m = NX.modal({
-      title: 'F12 — Cobrar Ticket ' + t.id,
+      title: 'F12 — Cobrar Ticket ' + t.id + (payload.ncfType ? ' · ' + NX.NCF_NAMES[payload.ncfType] : ''),
       html: '<div class="nx-modal-body">' +
         '<div class="nx-big-total"><span>TOTAL A COBRAR</span><b>' + NX.money(total) + '</b></div>' +
         '<div class="nx-methods" role="group" aria-label="Forma de pago">' +
@@ -320,16 +374,18 @@
       var doPrint = el.querySelector('#c-print').checked;
       NX.store.set('nexocaja-imprimir', doPrint);
       var err = el.querySelector('[data-err]'); err.hidden = true;
-      NX.api('POST', '/api/sales', { lines: payload.lines, wholesale: payload.wholesale, payments: payments() }).then(function (sale) {
+      NX.api('POST', '/api/sales', { lines: payload.lines, wholesale: payload.wholesale, ncfType: payload.ncfType, customerId: payload.customerId, payments: payments() }).then(function (sale) {
         close();
         var idx = st.tickets.indexOf(t);
         if (idx >= 0) { st.active = idx; closeTicket(); }
         render(); focusCode();
-        NX.toast('Venta ' + sale.folio + ' cobrada · ' + NX.money(sale.total) + (sale.change ? ' · Cambio ' + NX.money(sale.change) : ''));
+        NX.toast((sale.ncf ? sale.ncf : 'Venta ' + sale.folio) + ' cobrada · ' + NX.money(sale.total) + (sale.change ? ' · Cambio ' + NX.money(sale.change) : ''));
         NX.refreshFooter();
+        NX.loadFiscalStatus().then(function () { if (root) render(); });
         if (doPrint) NX.printSale(sale);
       }).catch(function (e) {
         busy = false; update();
+        if (e.status === 409 && /NCF|comprobante|cliente|identificar/.test(e.message)) NX.loadFiscalStatus().then(function () { if (root) render(); });
         if (e.status === 409 && /cerrada/.test(e.message)) {
           close();
           NX.toast(e.message, true);
@@ -378,7 +434,8 @@
       root = el;
       el.innerHTML =
         '<div class="nx-band"><h1 data-band-title>VENTA</h1><span class="nx-chip nx-chip--warn" data-wholesale-chip hidden>MAYOREO ACTIVO</span>' +
-        '<span class="nx-spacer"></span><span class="nx-chip">Ticket de venta · el comprobante fiscal (NCF) llega en una próxima versión</span></div>' +
+        '<span class="nx-spacer"></span><span class="nx-chip" data-doc-chip></span></div>' +
+        '<div class="nx-fiscalbar" data-fiscal></div>' +
         '<div class="nx-coderow"><label for="codigo">Código del producto:</label>' +
         '<input id="codigo" class="nx-input-code" autocomplete="off" placeholder="Escanee o escriba el código y presione Enter (3*código = 3 unidades)">' +
         '<button type="button" class="nx-btn nx-btn--enter" data-enter>ENTER — Agregar producto</button></div>' +
@@ -427,6 +484,12 @@
         var act = e.target.closest('[data-act]');
         if (act) changeQty(act.getAttribute('data-act') === 'inc' ? 1 : -1); else render();
       });
+      el.querySelector('[data-fiscal]').addEventListener('click', function (e) {
+        if (e.target.closest('[data-cust]')) chooseCustomer();
+        if (e.target.closest('[data-nocust]')) { ticket().customer = null; render(); focusCode(); }
+        var nb = e.target.closest('[data-ncf]'); if (nb && !nb.disabled) setNcfType(nb.getAttribute('data-ncf'));
+      });
+      NX.loadFiscalStatus().then(function () { if (root === el) render(); }).catch(function () {});
       on('[data-in]', function () { NX.cashMove('entrada'); });
       on('[data-out]', function () { NX.cashMove('salida'); });
       render();
@@ -445,6 +508,7 @@
         case 'F6': e.preventDefault(); hold(); break;
         case 'F12': e.preventDefault(); openCobro(); break;
         case 'F7': e.preventDefault(); NX.cashMove('entrada'); break;
+        case 'F2': e.preventDefault(); chooseCustomer(); break;
         case 'F8': e.preventDefault(); NX.cashMove('salida'); break;
         case 'Insert': e.preventDefault(); openVarios(); break;
         case 'Delete': if (codeEmpty) { e.preventDefault(); removeSel(); } break;

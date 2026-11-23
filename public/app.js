@@ -176,6 +176,12 @@
     if (c.rnc) h += '<div class="tk-center">RNC: ' + NX.esc(c.rnc) + '</div>';
     if (NX.info && NX.info.direccion) h += '<div class="tk-center">' + NX.esc(NX.info.direccion) + '</div>';
     if (NX.info && NX.info.telefono) h += '<div class="tk-center">Tel. ' + NX.esc(NX.info.telefono) + '</div>';
+    if (sale.ncf) {
+      h += '<hr class="tk-hr"><div class="tk-center tk-big">' + NX.esc((NX.NCF_NAMES && NX.NCF_NAMES[sale.ncfType]) || 'Factura') + '</div>' +
+        '<div class="tk-row"><span>NCF:</span><span>' + NX.esc(sale.ncf) + '</span></div>' +
+        (sale.ncfExpiresOn ? '<div class="tk-row"><span>Válido hasta:</span><span>' + NX.esc(sale.ncfExpiresOn.split('-').reverse().join('/')) + '</span></div>' : '');
+    }
+    if (sale.customerName) h += '<div>Cliente: ' + NX.esc(sale.customerName) + '</div>' + (sale.customerDoc ? '<div>RNC/Céd.: ' + NX.esc(sale.customerDoc) + '</div>' : '');
     h += '<hr class="tk-hr"><div class="tk-row"><span>Ticket ' + NX.esc(sale.folio) + '</span><span>' + NX.esc(NX.info ? NX.info.caja : '') + '</span></div>';
     h += '<div>' + NX.esc(when) + '</div>' + (sale.cashier ? '<div>Le atendió: ' + NX.esc(sale.cashier) + '</div>' : '') + '<hr class="tk-hr">';
     sale.lines.forEach(function (l) {
@@ -195,7 +201,7 @@
     });
     if (sale.change) h += '<div class="tk-row"><span>Cambio</span><span>' + NX.money(sale.change) + '</span></div>';
     h += '<hr class="tk-hr"><div class="tk-center">Gracias por su compra</div>';
-    h += '<div class="tk-center">DOCUMENTO NO VÁLIDO COMO COMPROBANTE FISCAL</div>';
+    if (!sale.ncf) h += '<div class="tk-center">DOCUMENTO NO VÁLIDO COMO COMPROBANTE FISCAL</div>';
     h += '<div class="tk-center" style="margin-top:4px">NexoCaja · NexTech360</div>';
     $('print-area').innerHTML = h;
     setTimeout(function () { window.print(); }, 50);

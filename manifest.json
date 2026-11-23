@@ -1,11 +1,11 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "date": "2026-11-23",
   "notes": [
-    "Acceso con PIN para cada usuario y cambio rapido de cajero",
-    "Roles: dueno, supervisor y cajero; anular ventas y sacar efectivo piden PIN de supervisor",
-    "Corte de caja: apertura con fondo, entradas y salidas (F7/F8), arqueo, cierre e impresion",
-    "Ventas del dia con reimpresion y anulacion"
+    "Configuracion fiscal: datos del emisor y comprobantes NCF (serie B)",
+    "Secuencias NCF con vencimiento, alertas y bloqueo al agotarse o vencer",
+    "Factura de Consumo, Credito Fiscal y Gubernamental desde la caja (F2 cliente)",
+    "Clientes con validacion de RNC y cedula"
   ],
   "files": [
     {
@@ -30,7 +30,7 @@
     },
     {
       "path": "lib/api.js",
-      "sha256": "a25f378757c36980dbe271d7848fc868070b5e5104aca6c4d86bcefefa62bee3"
+      "sha256": "f05fb5d8cd8851461665eafb81e0fbd11bde5db3f93e18df58998da819aa1d60"
     },
     {
       "path": "lib/auth.js",
@@ -42,7 +42,15 @@
     },
     {
       "path": "lib/db.js",
-      "sha256": "e4f45a4502848252a88293a36f7ae873328de67bb330ffb149ba330c45b2461d"
+      "sha256": "ac6bb14f58c1b47559062647b8262952bb3e8d39d410c203923ac3ca0d8454f4"
+    },
+    {
+      "path": "lib/fiscal.js",
+      "sha256": "f4195a338dbae058709b8a59787a1c646608c328bec1b56b7fa7b871bf7bdcf7"
+    },
+    {
+      "path": "lib/rd.js",
+      "sha256": "3695537f4a86ac972be4bbf24c022d63fd0085c1bcc58a996da0b5dc7d3cb631"
     },
     {
       "path": "lib/updater.js",
@@ -69,20 +77,24 @@
       "sha256": "95f90355a5c528822eaafcde8e74f3b1227bb1a5bedd29b3776a78e1a301d221"
     },
     {
+      "path": "migraciones/004_fiscal.sql",
+      "sha256": "9b10d8e7e79c9320aa644451f7487db0081e7d8b4f4a90b159adc785adddbb08"
+    },
+    {
       "path": "package.json",
-      "sha256": "075c7c1514ed97adc5fa06b0aae203694df5592f92e5651180e70685c35c7d8d"
+      "sha256": "561470967cf3562a836d46462551ae8d30ae70767f3c9684d8d55def4a8997de"
     },
     {
       "path": "public/acceso.js",
-      "sha256": "aa66aa2b556d06053ff77576ab7ccf397208eb94979f5e1e894cf9e42aa3ea40"
+      "sha256": "27b33b9b1a9d68ff0003739d508b0f375e31d6638a7dd83ccea7a51c60967a82"
     },
     {
       "path": "public/app.js",
-      "sha256": "d4381408eae87692ec8d2220663d920a3e8fdda79e9f65f977daa25120ddfe43"
+      "sha256": "264d5ff9ef4913da665c4e0c0a81d48e0885369826812c4d7c36712ef91eec97"
     },
     {
       "path": "public/caja.js",
-      "sha256": "2446b2ac44a9dfd3d8e170bebcd6eec7016e3200093ee6681bd7dbb77e0514ff"
+      "sha256": "e2c36c61044f7be6f07bff8944ff5574ec3b0f4359d1877ccf17173e701f027c"
     },
     {
       "path": "public/corte.js",
@@ -93,8 +105,12 @@
       "sha256": "47257ee0ab3b64c769219b0e95df7f711edf893ce19c31d29a11e57ce2454dec"
     },
     {
+      "path": "public/fiscal.js",
+      "sha256": "15409c38340067dd77822635802b94e60a40d45f9bac726f60722aec9093665f"
+    },
+    {
       "path": "public/index.html",
-      "sha256": "c2873b0039c27e73324b38c785dd7505701a78164a008123ef2de1e26cd2e7da"
+      "sha256": "c5dabde23f8ca956ff61d24b885d7a61136da63bc977ef46ea29141e0a8346db"
     },
     {
       "path": "public/productos.js",
@@ -102,7 +118,7 @@
     },
     {
       "path": "public/styles.css",
-      "sha256": "861b016ac401fcfe34cc92f80b7435f12d74b9203fd8606226c106141613faab"
+      "sha256": "7ced91ee3d477257a39238f3e62e16c8691a5c60c9580f4ee417ef986636559d"
     },
     {
       "path": "public/usuarios.js",
@@ -118,7 +134,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "677a14f9e235d755cc914474f4d62a0fc7f0cea773ee2176b99a265929785a99"
+      "sha256": "2c698f8916ccb93e7b2273180ddb2e10f058f69d17ec345a18d45484efad6973"
     }
   ]
 }

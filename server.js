@@ -13,12 +13,13 @@ process.on('warning', (w) => {
   console.warn(w.message);
 });
 
-let dbMod, updater, api, auth;
+let dbMod, updater, api, auth, fiscal;
 try {
   dbMod = await import('./lib/db.js');
   updater = await import('./lib/updater.js');
   api = await import('./lib/api.js');
   auth = await import('./lib/auth.js');
+  fiscal = await import('./lib/fiscal.js');
 } catch (err) {
   if (/sqlite/i.test(String(err.message))) {
     console.error('\n  Tu versión de Node.js es muy vieja para NexoCaja (necesita 22.13 o superior).');
@@ -117,10 +118,10 @@ async function handle(req, res) {
   }
 
   if (pathname === '/api/info' && req.method === 'GET') {
-    const company = dbMod.getDb().prepare('SELECT legal_name, trade_name, rnc, branch, tax_regime FROM company WHERE id = 1').get();
+    const company = dbMod.getDb().prepare('SELECT legal_name, trade_name, rnc, branch, tax_regime, address, phone FROM company WHERE id = 1').get();
     return json(res, 200, {
       version: VERSION, company, caja: cfg.caja, dgiiAmbiente: cfg.dgii.ambiente, local: isLocal(req),
-      direccion: cfg.empresa.direccion || '', telefono: cfg.empresa.telefono || ''
+      direccion: (company && company.address) || '', telefono: (company && company.phone) || '', fiscalMode: fiscal.fiscalMode(dbMod.getDb())
     });
   }
 
@@ -198,6 +199,7 @@ async function handle(req, res) {
         return json(res, 404, { error: 'No encontrado' });
       }
       ctx.user = auth.currentUser(db, req);
+      if ((await fiscal.handleFiscal(req, res, pathname, searchParams, ctx)) !== false) return;
       const handled = await api.handleApi(req, res, pathname, searchParams, ctx);
       if (handled) return;
     } catch (err) {
