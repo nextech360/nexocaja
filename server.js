@@ -48,7 +48,12 @@ process.on('unhandledRejection', (e) => { logError(e); console.error(e); });
 dbMod.openDb(cfg, VERSION);
 dbMod.migrate((m) => console.log(m));
 dbMod.seedCompany(cfg);
-(await import('./lib/ecf/emision.js')).initEcf(cfg);
+const ecfEmision = await import('./lib/ecf/emision.js');
+const ecfCola = await import('./lib/ecf/cola.js');
+const ecfRutas = await import('./lib/ecf/rutas.js');
+ecfEmision.initEcf(cfg);
+ecfCola.startQueue(dbMod.getDb());
+ecfEmision.onEcfIssued(ecfCola.kick);
 
 // ── Estado de trabajos ───────────────────────────────────────────
 // Cuando existan ventas/cobros, cada operación en curso hace busy++ / busy--.
@@ -204,6 +209,7 @@ async function handle(req, res) {
       ctx.user = auth.currentUser(db, req);
       if ((await fiscal.handleFiscal(req, res, pathname, searchParams, ctx)) !== false) return;
       if ((await returns.handleReturns(req, res, pathname, searchParams, ctx)) !== false) return;
+      if ((await ecfRutas.handleEcf(req, res, pathname, searchParams, ctx)) !== false) return;
       if ((await reports.handleReports(req, res, pathname, searchParams, ctx)) !== false) return;
       const handled = await api.handleApi(req, res, pathname, searchParams, ctx);
       if (handled) return;

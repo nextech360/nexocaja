@@ -1,12 +1,13 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "date": "2026-11-23",
   "notes": [
-    "Facturacion electronica (e-CF): firma digital XMLDSig con tu certificado .p12 / .pfx",
-    "Factura de Consumo, Credito Fiscal y Gubernamental electronicas (E32, E31, E45) desde la caja",
-    "Nota de Credito electronica (E34) en devoluciones",
-    "Factura impresa con codigo QR, codigo de seguridad y fecha de firma",
-    "Ambiente de pruebas TesteCF / CerteCF: el envio a la DGII llega en la 1.6.0"
+    "Envio de e-CF a la DGII: autenticacion con tu certificado, TrackId y consulta de estado",
+    "Facturas de Consumo menores de RD$250,000 se envian como Resumen (RFCE)",
+    "Contingencia: si no hay internet se sigue vendiendo y se envia solo al volver (plazo 72 h)",
+    "Nueva pantalla Comprobantes e-CF: pendientes, aceptados, rechazados, bitacora y reemision",
+    "Indicador de estado e-CF en la parte de arriba y boton Probar conexion",
+    "Ambiente de Produccion habilitado"
   ],
   "files": [
     {
@@ -54,24 +55,36 @@
       "sha256": "036a9acc5f236100de02d3bcd5d10e2f0d9e055463b5721eae4ebcadf2413110"
     },
     {
+      "path": "lib/ecf/cola.js",
+      "sha256": "c5329416431d42420f0f279182671bd3778b58f5e88b37888dfc37e87db5319b"
+    },
+    {
+      "path": "lib/ecf/dgii.js",
+      "sha256": "71105552eca364033678abd145234dcbcbadaa3a5a0a1aa9aaf01f7b6961bec2"
+    },
+    {
       "path": "lib/ecf/emision.js",
-      "sha256": "db1a16d93cdb269a648657328476bbe66a3a0b5d01c628cbd15bd726c9480026"
+      "sha256": "cc26961bfc97006a5a98a246666fd5f8edf649b1b8c32ebdf66ded3a88dd1732"
     },
     {
       "path": "lib/ecf/firma.js",
-      "sha256": "e43d5d7597b978e69e14c92c261175ff9677878fecb9aec9bb36d399fdab4033"
+      "sha256": "280591badcf52846a84818cc61c8a83e1c78e8817bf36449bac2673c56ac73b2"
     },
     {
       "path": "lib/ecf/p12.js",
       "sha256": "7cce09e36592ec231e02a09b15c2f980fefe383cb57efaf8baf84020da0ee6c6"
     },
     {
+      "path": "lib/ecf/rutas.js",
+      "sha256": "16413d25dd3e879cfba7c985f7462675568ae61d1370738f8dd46b452e6e146e"
+    },
+    {
       "path": "lib/ecf/xml.js",
-      "sha256": "31aa3a5269d4517f1cbba3764d10321f3f294a62e0557a3c1d39013a5919162f"
+      "sha256": "dc91d2d916ce77d24a14ffe44e834bed8fad00208243f83a4bb1a20625005a25"
     },
     {
       "path": "lib/fiscal.js",
-      "sha256": "572f0a09273310747478ffd42d2fd778919246d3fa525d9d2066f5c012833a75"
+      "sha256": "340b7cd2b55ca90746813dadfaf8a00fb25940ef482be4d4bb9e4c916371d290"
     },
     {
       "path": "lib/rd.js",
@@ -118,8 +131,12 @@
       "sha256": "718bba8d806347545b27cc0fd979da8de51901775c0178f7963d0206987f9185"
     },
     {
+      "path": "migraciones/007_ecf_envio.sql",
+      "sha256": "f0139c13e02c1b98154b0ac64f79b52528eed788ebf876e24aa83a2eafa89c7a"
+    },
+    {
       "path": "package.json",
-      "sha256": "b2e08f5b5060f4c648d0fa3d259f9f86db0b53fc411b8f64b0553e4a4cb03455"
+      "sha256": "0d3f0b3d46b3f0707e06c506fbdf059b1cc3ca086fd62e8826fba12fb130656f"
     },
     {
       "path": "public/acceso.js",
@@ -142,16 +159,20 @@
       "sha256": "29c51467fa86a4217242f4ea8da1b8c4fee68c68791b4a3c07e6f9cdfa47064d"
     },
     {
+      "path": "public/ecf.js",
+      "sha256": "f2840bd1f6a0d4a2ae9ba5e46fefe060866a80f04c896952c6cc10c645e78bea"
+    },
+    {
       "path": "public/favicon.svg",
       "sha256": "47257ee0ab3b64c769219b0e95df7f711edf893ce19c31d29a11e57ce2454dec"
     },
     {
       "path": "public/fiscal.js",
-      "sha256": "f07bc46011dfbc31a23e5682f7bcf864bb998e3a4880eadf16c303adb05f8b03"
+      "sha256": "9793f07306c8102fc38e75c4638dba4bc95b641c4e9bdbd7110e791de82233d7"
     },
     {
       "path": "public/index.html",
-      "sha256": "3bab8cf3e8061fccf61565ba5fe6c21a43d66ecd86f20796e0b4ba1252cee5a0"
+      "sha256": "7f835af117fcd10d48adfc460c0fdae0bba4c2ed0a221200ee70cd32a8713b92"
     },
     {
       "path": "public/productos.js",
@@ -167,7 +188,7 @@
     },
     {
       "path": "public/styles.css",
-      "sha256": "b33a66aa62750bc09f8bb56e5b04ed75739522ea80526c424788b032e91f971b"
+      "sha256": "06110e135ed474f66dd274663e85bc216a5331edab73c97c4c4947d9f51a9d2b"
     },
     {
       "path": "public/usuarios.js",
@@ -183,7 +204,7 @@
     },
     {
       "path": "server.js",
-      "sha256": "a918ae614fa78cbb46190e9ea8cd152d89a7c620c8577c87ed9bc65ccec31918"
+      "sha256": "b5134716d0ee51c60733538ad3797e010136818968a4fc94b1feb27bba91cf60"
     }
   ]
 }

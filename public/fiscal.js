@@ -38,7 +38,13 @@
 
   NX.fiscal = { status: null };
   NX.loadFiscalStatus = function () {
-    return NX.api('GET', '/api/fiscal/status').then(function (s) { NX.fiscal.status = s; return s; });
+    return NX.api('GET', '/api/fiscal/status').then(function (s) {
+      NX.fiscal.status = s;
+      var nav = document.querySelector('[data-ecfnav]');
+      if (nav) nav.hidden = !(s.mode === 'ECF' && NX.can('reportes.ver'));
+      if (NX.startEcfPoll) NX.startEcfPoll();
+      return s;
+    });
   };
 
   // ── Cliente: crear / editar (lo usan Clientes y la Caja) ──────
@@ -224,8 +230,9 @@
       '<div class="nx-field" style="justify-content:flex-end"><button type="submit" class="nx-btn nx-btn--primary" style="height:40px">Subir certificado</button></div>' +
       '<div class="nx-error full" data-cerr hidden></div></form>';
     h += '<div class="nx-field" style="margin-top:10px"><label for="ce-amb">Ambiente de la DGII</label><select id="ce-amb">' +
-      ['TesteCF', 'CerteCF', 'eCF'].map(function (a) { return '<option value="' + a + '"' + (a === co.ambiente ? ' selected' : '') + (a === 'eCF' ? ' disabled' : '') + '>' + AMB[a] + (a === 'eCF' ? ' — llega en la 1.6.0' : '') + '</option>'; }).join('') +
-      '</select><small>En pruebas y certificación los e-CF no tienen validez fiscal.</small></div>';
+      ['TesteCF', 'CerteCF', 'eCF'].map(function (a) { return '<option value="' + a + '"' + (a === co.ambiente ? ' selected' : '') + '>' + AMB[a] + '</option>'; }).join('') +
+      '</select><small>En pruebas y certificación los e-CF no tienen validez fiscal. Producción solo después de que la DGII te certifique.</small></div>' +
+      '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px"><button type="button" class="nx-btn" data-test' + (cert ? '' : ' disabled') + '>Probar conexión con la DGII</button><span data-testres class="nx-muted" style="font-size:13px"></span></div>';
     if (docs && docs.length) {
       h += '<h2 style="margin-top:14px">Últimos e-CF</h2><div class="nx-tablebox" style="min-height:0;max-height:260px"><table class="nx-table" style="min-width:0"><thead><tr><th>e-NCF</th><th class="r">Total</th><th>Estado</th><th></th></tr></thead><tbody>' +
         docs.map(function (d) {
@@ -252,9 +259,20 @@
       };
       rd.readAsDataURL(file);
     });
+    froot.querySelector('[data-test]').addEventListener('click', function (e) {
+      var b = e.currentTarget, out = froot.querySelector('[data-testres]');
+      b.disabled = true; out.textContent = 'Conectando…'; out.style.color = '';
+      NX.api('POST', '/api/ecf/test', {}).then(function (r) { out.textContent = (r.ok ? '✔ ' : '✖ ') + r.mensaje; out.style.color = r.ok ? '#15803d' : '#b91c1c'; })
+        .catch(function (x) { out.textContent = '✖ ' + x.message; out.style.color = '#b91c1c'; })
+        .then(function () { b.disabled = false; });
+    });
     froot.querySelector('#ce-amb').addEventListener('change', function (e) {
-      NX.api('PUT', '/api/fiscal/ambiente', { ambiente: e.target.value }).then(function () { NX.toast('Ambiente: ' + AMB[e.target.value]); loadFiscal(); })
+      var v = e.target.value;
+      var go = v === 'eCF' ? NX.confirm('Pasar a Producción', 'Solo cambia a Producción cuando la DGII ya te haya autorizado como emisor electrónico. Desde ese momento cada e-CF tiene validez fiscal y se reporta a la DGII. Necesitas secuencias E de producción registradas.', 'Pasar a Producción') : Promise.resolve(true);
+      go.then(function (ok) { if (!ok) { loadFiscal(); return; }
+      NX.api('PUT', '/api/fiscal/ambiente', { ambiente: v }).then(function () { NX.toast('Ambiente: ' + AMB[v]); loadFiscal(); })
         .catch(function (x) { NX.toast(x.message, true); loadFiscal(); });
+      });
     });
   }
 

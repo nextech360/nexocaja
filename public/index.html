@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NexoCaja · Punto de Venta</title>
-  <link rel="icon" href="/favicon.svg?v=1.5.0" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=1.5.0">
+  <link rel="icon" href="/favicon.svg?v=1.6.0" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css?v=1.6.0">
 </head>
 <body>
   <div id="app">
@@ -30,6 +30,7 @@
         </div>
       </div>
       <div class="nx-shift"><span class="nx-dot" aria-hidden="true"></span><span id="h-caja">Caja</span></div>
+      <button type="button" id="ecf-pill" class="nx-ecf-pill" hidden>e-CF</button>
       <div class="nx-spacer"></div>
       <div class="nx-company">
         <strong id="company-name">…</strong>
@@ -47,6 +48,7 @@
       <a href="#/corte" data-route="corte" class="nx-btn"><kbd class="nx-key">F4</kbd>Corte de caja</a>
       <a href="#/devoluciones" data-route="devoluciones" class="nx-btn">Devoluciones</a>
       <a href="#/clientes" data-route="clientes" class="nx-btn">Clientes</a>
+      <a href="#/ecf" data-route="ecf" class="nx-btn" data-ecfnav hidden>Comprobantes e-CF</a>
       <a href="#/reportes" data-route="reportes" class="nx-btn" data-need="reportes.ver" hidden>Reportes DGII</a>
       <a href="#/fiscal" data-route="fiscal" class="nx-btn" data-owner hidden>Configuración fiscal</a>
       <a href="#/usuarios" data-route="usuarios" class="nx-btn" data-owner hidden>Usuarios</a>
@@ -74,16 +76,17 @@
   <div id="toast" class="nx-toast" role="status" hidden></div>
   <div id="print-area" aria-hidden="true"></div>
 
-  <script src="/app.js?v=1.5.0"></script>
-  <script src="/qr.js?v=1.5.0"></script>
-  <script src="/caja.js?v=1.5.0"></script>
-  <script src="/productos.js?v=1.5.0"></script>
-  <script src="/acceso.js?v=1.5.0"></script>
-  <script src="/corte.js?v=1.5.0"></script>
-  <script src="/usuarios.js?v=1.5.0"></script>
-  <script src="/fiscal.js?v=1.5.0"></script>
-  <script src="/devoluciones.js?v=1.5.0"></script>
-  <script src="/reportes.js?v=1.5.0"></script>
+  <script src="/app.js?v=1.6.0"></script>
+  <script src="/qr.js?v=1.6.0"></script>
+  <script src="/caja.js?v=1.6.0"></script>
+  <script src="/productos.js?v=1.6.0"></script>
+  <script src="/acceso.js?v=1.6.0"></script>
+  <script src="/corte.js?v=1.6.0"></script>
+  <script src="/usuarios.js?v=1.6.0"></script>
+  <script src="/fiscal.js?v=1.6.0"></script>
+  <script src="/devoluciones.js?v=1.6.0"></script>
+  <script src="/reportes.js?v=1.6.0"></script>
+  <script src="/ecf.js?v=1.6.0"></script>
   <script>NX.start();</script>
 </body>
 </html>

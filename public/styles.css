@@ -259,3 +259,16 @@ input, select { font: inherit; color: inherit; }
 .nx-table tr.is-bad input { border-color: #dc2626; background: #fef2f2; }
 #print-area .tk-qr { display: flex; justify-content: center; margin: 4px 0; }
 #print-area .tk-qr svg { width: 34mm; height: 34mm; }
+
+/* ── e-CF (1.6.0) ───────────────────────────────── */
+.nx-ecf-pill { border: 1px solid; border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 700; cursor: pointer; background: #fff; }
+.nx-ecf-pill--ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+.nx-ecf-pill--warn { background: var(--nx-warn-soft); border-color: #fcd34d; color: #92400e; }
+.nx-ecf-pill--bad { background: #fee2e2; border-color: #fca5a5; color: #7f1d1d; }
+.nx-ecf-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 10px; }
+.nx-ecf-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; cursor: pointer; text-align: left; font: inherit; }
+.nx-ecf-card b { font-size: 22px; }
+.nx-ecf-card.is-on { outline: 2px solid var(--nx-primary); }
+.nx-dl { display: grid; grid-template-columns: 170px 1fr; gap: 6px 10px; margin: 0; }
+.nx-dl dt { color: var(--nx-muted); }
+.nx-dl dd { margin: 0; }
